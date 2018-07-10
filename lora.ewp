@@ -16,7 +16,7 @@
                 <debug>1</debug>
                 <option>
                     <name>GenDeviceSelectMenu</name>
-                    <state>STM8L152R8	STM8L152R8</state>
+                    <state>STM8L052R8	STM8L052R8</state>
                 </option>
                 <option>
                     <name>GenCodeModel</name>
@@ -47,38 +47,38 @@
                 <option>
                     <name>GenRuntimeLibSelect</name>
                     <version>0</version>
-                    <state>1</state>
+                    <state>2</state>
                 </option>
                 <option>
                     <name>GenRuntimeLibSelectSlave</name>
                     <version>0</version>
-                    <state>1</state>
+                    <state>2</state>
                 </option>
                 <option>
                     <name>GenRTDescription</name>
-                    <state>Use the normal configuration of the C/EC++ runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
+                    <state>Use the full configuration of the C/EC++ runtime library. Full locale interface, C locale, file descriptor support, multibytes in printf and scanf, and hex floats in strtod.</state>
                 </option>
                 <option>
                     <name>GenRTConfigPath</name>
-                    <state>$TOOLKIT_DIR$\LIB\dlstm8smn.h</state>
+                    <state>$TOOLKIT_DIR$\LIB\dlstm8smf.h</state>
                 </option>
                 <option>
                     <name>GenLibInFormatter</name>
                     <version>0</version>
-                    <state>2</state>
+                    <state>5</state>
                 </option>
                 <option>
                     <name>GenLibInFormatterDescription</name>
-                    <state>Full formatting, without multibytes.</state>
+                    <state>No specifier n, no float, no scan set, no assignment suppressing.</state>
                 </option>
                 <option>
                     <name>GenLibOutFormatter</name>
                     <version>0</version>
-                    <state>2</state>
+                    <state>3</state>
                 </option>
                 <option>
                     <name>GenLibOutFormatterDescription</name>
-                    <state>Full formatting, without multibytes.</state>
+                    <state>No specifier a or A.</state>
                 </option>
                 <option>
                     <name>GenStackSize</name>
@@ -188,7 +188,8 @@
                 </option>
                 <option>
                     <name>CCDefines</name>
-                    <state></state>
+                    <state>STM8L05X_HD_VL</state>
+                    <state>DEBUG</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -607,7 +608,7 @@
                 </option>
                 <option>
                     <name>IlinkIcfFile</name>
-                    <state>$TOOLKIT_DIR$\config\lnkstm8l152r8.icf</state>
+                    <state>$TOOLKIT_DIR$\config\lnkstm8l052r8.icf</state>
                 </option>
                 <option>
                     <name>IlinkIcfFileSlave</name>
@@ -1610,19 +1611,241 @@
             <name>$PROJ_DIR$\inc\config.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\inc\stm8l10x_conf.h</name>
+            <name>$PROJ_DIR$\inc\init.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\inc\lora.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\inc\protocol.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\inc\stm8l15x_conf.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\inc\stm8l15x_it.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\inc\task.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\inc\uart.h</name>
         </file>
     </group>
     <group>
         <name>libs</name>
         <group>
             <name>inc</name>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_adc.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_aes.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_beep.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_clk.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_comp.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_dac.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_dma.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_exti.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_flash.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_gpio.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_i2c.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_irtim.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_itc.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_iwdg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_lcd.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_pwr.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_rst.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_rtc.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_spi.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_syscfg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_tim1.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_tim2.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_tim3.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_tim4.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_tim5.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_usart.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_wfe.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\stm8l15x_wwdg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\inc\timing_delay.h</name>
+            </file>
+        </group>
+        <group>
+            <name>src</name>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_adc.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_aes.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_beep.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_clk.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_comp.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_dac.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_dma.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_exti.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_flash.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_gpio.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_i2c.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_irtim.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_itc.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_iwdg.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_lcd.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_pwr.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_rst.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_rtc.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_spi.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_syscfg.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_tim1.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_tim2.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_tim3.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_tim4.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_tim5.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_usart.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_wfe.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\stm8l15x_wwdg.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\libs\src\timing_delay.c</name>
+            </file>
         </group>
     </group>
     <group>
         <name>src</name>
         <file>
-            <name>$PROJ_DIR$\src\program_data.c</name>
+            <name>$PROJ_DIR$\src\at_cmd.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\clock.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\config.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\data.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\init.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\protocol.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\stm8l15x_it.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\task.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\uart.c</name>
         </file>
     </group>
     <file>

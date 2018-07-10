@@ -24,10 +24,11 @@
   * limitations under the License.
   *
   ******************************************************************************
-  */ 
+  */
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm8l15x_it.h"
+#include "lora.h"
 
 /** @addtogroup STM8L15x_StdPeriph_Examples
   * @{
@@ -91,6 +92,19 @@ INTERRUPT_HANDLER(DMA1_CHANNEL0_1_IRQHandler, 2)
   /* In order to detect unexpected events during development,
      it is recommended to set a breakpoint on the following instruction.
   */
+  if (DMA_GetFlagStatus(DMA1_FLAG_HT0) == SET)
+  {
+    IsDevSend = FALSE;
+    DMA_ClearFlag(DMA1_FLAG_HT0);
+    DMA_ClearITPendingBit(DMA1_IT_HT0);
+  }
+  if (DMA_GetFlagStatus(DMA1_FLAG_HT1) == SET)
+  {
+    IsLoraSend = FALSE;
+    setRS485CTL(DISABLE);
+    DMA_ClearFlag(DMA1_FLAG_HT1);
+    DMA_ClearITPendingBit(DMA1_IT_HT1);
+  }
 }
 /**
   * @brief DMA1 channel2 and channel3 Interrupt routine.
@@ -302,8 +316,20 @@ INTERRUPT_HANDLER(TIM2_CC_USART2_RX_IRQHandler, 20)
   /* In order to detect unexpected events during development,
      it is recommended to set a breakpoint on the following instruction.
   */
+  if (USART_GetFlagStatus(DevCom, USART_FLAG_IDLE))
+  {
+    uint8_t len = DMA_GetCurrDataCounter(LORA_DMA_RX);
+    //bool rst = PushData(LORA_RECV_BUFF, len);
+    uint8_t *data = (uint8_t *)malloc(len);
+    memcpy(data, LORA_RECV_BUFF, len);
+    Task *t = (Task *)malloc(sizeof(Task));
+    t->type = DEV_RECV_DATA;
+    t->data = data;
+    t->dataLen = len;
+    pushTask(t);
+    USART_ClearFlag(DevCom, USART_FLAG_IDLE);
+  }
 }
-
 
 /**
   * @brief Timer3 Update/Overflow/Trigger/Break Interrupt routine.
@@ -337,6 +363,20 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_COM_IRQHandler, 23)
   /* In order to detect unexpected events during development,
      it is recommended to set a breakpoint on the following instruction.
   */
+  if (TIM1_GetFlagStatus(TIM1_FLAG_Update))
+  {
+    TIM1_ClearFlag(TIM1_FLAG_Update);
+    TickNum++;
+    if (TickNum >= 50)
+    {
+      Second++;
+    }
+    Task *task = (Task *)malloc(sizeof(Task));
+    task->type = TICK;
+    task->data = NULL;
+    task->dataLen = 0;
+    pushTask(task);
+  }
 }
 /**
   * @brief TIM1 Capture/Compare Interrupt routine.
@@ -395,6 +435,19 @@ INTERRUPT_HANDLER(USART1_RX_TIM5_CC_IRQHandler, 28)
   /* In order to detect unexpected events during development,
      it is recommended to set a breakpoint on the following instruction.
   */
+  if (USART_GetFlagStatus(LoraCom, USART_FLAG_IDLE))
+  {
+    uint8_t len = DMA_GetCurrDataCounter(LORA_DMA_RX);
+    //bool rst = PushData(LORA_RECV_BUFF, len);
+    uint8_t *data = (uint8_t *)malloc(len);
+    memcpy(data, LORA_RECV_BUFF, len);
+    Task *t = (Task *)malloc(sizeof(Task));
+    t->type = LORA_RECV_DATA;
+    t->data = data;
+    t->dataLen = len;
+    pushTask(t);
+    USART_ClearFlag(LoraCom, USART_FLAG_IDLE);
+  }
 }
 
 /**

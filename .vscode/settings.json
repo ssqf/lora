@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "*.dot": "dot",
+        "config.h": "c",
+        "stm8l15x_conf.h": "c",
+        "stm8l15x.h": "c",
+        "stm8l15x_adc.h": "c",
+        "stm8l15x_it.h": "c",
+        "stm8l15x_clk.h": "c"
+    },
+    "C_Cpp.intelliSenseEngineFallback": "Disabled"
+}
