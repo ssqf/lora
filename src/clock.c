@@ -14,12 +14,13 @@ void InitClock()
 
 static void time1Config(void)
 {
-    CLK_PeripheralClockConfig(CLK_Peripheral_TIM1, ENABLE);
+    //TIM1_PrescalerConfig(1, TIM1_PSCReloadMode_Update);
     TIM1_TimeBaseInit(15, TIM1_CounterMode_Down, TIM1_PERIOD, 0); //15+1
     TIM1_SetAutoreload(TIM1_PERIOD);
     TIM1_ARRPreloadConfig(ENABLE);
     TIM1_ITConfig(TIM1_IT_Update, ENABLE);
     ITC_SetSoftwarePriority(TIM1_UPD_OVF_TRG_IRQn, ITC_PriorityLevel_0);
+    CLK_PeripheralClockConfig(CLK_Peripheral_TIM1, ENABLE);
     TIM1_Cmd(ENABLE);
 }
 

@@ -11,7 +11,7 @@ int main(void)
     // putchar(ans);
     //SendDevice("Hello World\n", 12);
     //SendDevice("Hello World1\n", 13);
-    handleTask();
+    HandleTask();
   }
   return 0;
 }

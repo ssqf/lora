@@ -7,20 +7,12 @@
 // uint8_t DevRxBuff[100] = {0};
 // uint8_t DevTxBuff[100] = {0};
 
-uint8_t LoraRxStart = 0;
-uint8_t LoraTxStart = 0;
-uint8_t LoraRxEnd = 0;
-uint8_t LoraTxEnd = 0;
-uint8_t DevRxStart = 0;
-uint8_t DevTxStart = 0;
-uint8_t DevRxEnd = 0;
-uint8_t DevTxEnd = 0;
-
 const uint32_t LoraBaudRate = 115200; //lora WH-L101 默认值 波特率 115200、无校验、8 位数据位、1 位停止位
+const uint32_t DevBaudRate = 9600;
 
 bool IsLoraSend = FALSE;
 bool IsDevSend = FALSE;
-void setRS485CTL(bool state);
+void SetRS485CTL(BitAction state);
 static void initDMA();
 static void initDeviceUart();
 static void initLoraUart();
@@ -75,6 +67,9 @@ static void initDMA()
     DMA_Cmd(DEV_DMA_RX, ENABLE);
     DMA_Cmd(DEV_DMA_TX, DISABLE);
 
+    USART_DMACmd(LoraCom, USART_DMAReq_RX, ENABLE);
+    USART_DMACmd(DevCom, USART_DMAReq_RX, ENABLE);
+
     DMA_GlobalCmd(ENABLE);
 }
 
@@ -82,20 +77,33 @@ static void initDeviceUart()
 {
     USART_ClockInit(DevCom, USART_Clock_Enable, USART_CPOL_Low, USART_CPHA_1Edge, USART_LastBit_Disable);
     USART_SetPrescaler(DevCom, 1);
-    USART_Init(DevCom, 9600, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Rx | USART_Mode_Tx);
-    USART_DMACmd(DevCom, USART_DMAReq_TX | USART_DMAReq_RX, ENABLE);
-    USART_ITConfig(DevCom, USART_IT_IDLE, ENABLE);
-    USART_Cmd(DevCom, DISABLE);
+
+    /* Configure USART Rx as alternate function push-pull  (software pull up)*/
+    //GPIO_ExternalPullUpConfig(GPIOE, GPIO_Pin_3, ENABLE);
+    //GPIO_ExternalPullUpConfig(GPIOE, GPIO_Pin_4, ENABLE);
+
+    USART_Init(DevCom, DevBaudRate, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Tx| USART_Mode_Rx);
+    //USART_Init(DevCom, DevBaudRate, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Rx);
+    //USART_DMACmd(DevCom, USART_DMAReq_TX | USART_DMAReq_RX, ENABLE);
+    //USART_ITConfig(DevCom, USART_IT_IDLE, ENABLE);
+    //USART_ITConfig(DevCom, USART_IT_TC, ENABLE);
+    USART_Cmd(DevCom, ENABLE);
 }
 
 static void initLoraUart()
 {
     USART_ClockInit(LoraCom, USART_Clock_Enable, USART_CPOL_Low, USART_CPHA_1Edge, USART_LastBit_Disable);
     USART_SetPrescaler(LoraCom, 1);
+
+    /* Configure USART Rx as alternate function push-pull  (software pull up)*/
+    //GPIO_ExternalPullUpConfig(GPIOC, GPIO_Pin_2, ENABLE);
+    //GPIO_ExternalPullUpConfig(GPIOC, GPIO_Pin_3, ENABLE);
+
     USART_Init(LoraCom, LoraBaudRate, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Rx | USART_Mode_Tx);
-    USART_DMACmd(LoraCom, USART_DMAReq_TX | USART_DMAReq_RX, ENABLE);
-    USART_ITConfig(LoraCom, USART_IT_IDLE, ENABLE);
-    USART_Cmd(DevCom, DISABLE);
+    //USART_DMACmd(LoraCom, USART_DMAReq_TX | USART_DMAReq_RX, ENABLE);
+    //USART_ITConfig(LoraCom, USART_IT_IDLE, ENABLE);
+    //USART_ITConfig(LoraCom, USART_IT_TC, ENABLE);
+    USART_Cmd(DevCom, ENABLE);
 }
 
 void SendDevice(uint8_t *data, uint8_t dataLen)
@@ -105,15 +113,16 @@ void SendDevice(uint8_t *data, uint8_t dataLen)
     uint8_t remainLen = dataLen;
     while (0 != remainLen)
     {
-        while (IsDevSend) //等待发送结束
-        {
-        }
+        while (IsDevSend)
+            ; //等待发送结束
 
         len = DEV_SEND_BUFF_SIZE <= remainLen ? DEV_SEND_BUFF_SIZE : remainLen;
         memcpy(DEV_SEND_BUFF, data + pos, len);
         DMA_Cmd(DEV_DMA_TX, DISABLE);
         DMA_SetCurrDataCounter(DEV_DMA_TX, len);
         DMA_Cmd(DEV_DMA_TX, ENABLE);
+        SetRS485CTL(SET);
+        USART_DMACmd(DevCom, USART_DMAReq_TX, ENABLE);
         pos = pos + len;
         remainLen = remainLen - len;
         IsDevSend = TRUE;
@@ -127,29 +136,29 @@ void SendLora(uint8_t *data, uint8_t dataLen)
     uint8_t remainLen = dataLen;
     while (0 != remainLen)
     {
-        while (IsDevSend) //等待发送结束
+        while (IsLoraSend) //等待发送结束
         {
         }
 
-        len = DEV_SEND_BUFF_SIZE <= remainLen ? DEV_SEND_BUFF_SIZE : remainLen;
-        memcpy(DEV_SEND_BUFF, data + pos, len);
-        DMA_Cmd(DEV_DMA_TX, DISABLE);
-        DMA_SetCurrDataCounter(DEV_DMA_TX, len);
-        setRS485CTL(ENABLE);
-        DMA_Cmd(DEV_DMA_TX, ENABLE);
+        len = LORA_SEND_BUFF_SIZE <= remainLen ? LORA_SEND_BUFF_SIZE : remainLen;
+        memcpy(LORA_SEND_BUFF, data + pos, len);
+        DMA_Cmd(LORA_DMA_TX, DISABLE);
+        DMA_SetCurrDataCounter(LORA_DMA_TX, len);
+        DMA_Cmd(LORA_DMA_TX, ENABLE);
+        USART_DMACmd(LoraCom, USART_DMAReq_TX, ENABLE);
         pos = pos + len;
         remainLen = remainLen - len;
-        IsDevSend = TRUE;
+        IsLoraSend = TRUE;
     }
 }
 
 static void initRS458CTL()
 {
     GPIO_Init(GPIOE, GPIO_Pin_2, GPIO_Mode_Out_PP_High_Fast);
-    setRS485CTL(DISABLE);
+    SetRS485CTL(RESET);
 }
 
-void setRS485CTL(bool state)
+void SetRS485CTL(BitAction state)
 {
     GPIO_WriteBit(GPIOE, GPIO_Pin_2, state);
 }
@@ -161,7 +170,7 @@ void initUart3()
     GPIO_ExternalPullUpConfig(GPIOF, GPIO_Pin_0, ENABLE);
 
     /* Configure USART Rx as alternate function push-pull  (software pull up)*/
-    GPIO_ExternalPullUpConfig(GPIOF, GPIO_Pin_0, ENABLE);
+    GPIO_ExternalPullUpConfig(GPIOF, GPIO_Pin_1, ENABLE);
 
     USART_ClockInit(USART3, USART_Clock_Enable, USART_CPOL_Low, USART_CPHA_1Edge, USART_LastBit_Disable);
     USART_SetPrescaler(USART3, 1);
@@ -169,6 +178,23 @@ void initUart3()
     USART_Init(DevCom, 9600, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Rx | USART_Mode_Tx);
     //USART_ITConfig(USART3, USART_IT_IDLE, ENABLE);
     USART_Cmd(USART3, ENABLE);
+}
+
+void ResetDMARx(USART usart)
+{
+    if (usart == DevUSART)
+    {
+        DMA_SetCurrDataCounter(DEV_DMA_RX, DEV_RECV_BUFF_SIZE);
+        DMA_Cmd(DEV_DMA_RX, ENABLE);
+        USART_DMACmd(DevCom, USART_DMAReq_RX, ENABLE);
+    }
+
+    if (usart == LoraUSART)
+    {
+        DMA_SetCurrDataCounter(LORA_DMA_RX, LORA_RECV_BUFF_SIZE);
+        DMA_Cmd(LORA_DMA_RX, ENABLE);
+        USART_DMACmd(LoraCom, USART_DMAReq_RX, ENABLE);
+    }
 }
 
 int putchar(int c)

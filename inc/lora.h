@@ -6,8 +6,9 @@
 #include "task.h"
 #include "uart.h"
 #include "init.h"
+#include "clock.h"
 
-#define NULL ((void *)0)
+//#define NULL ((void *)0)
 
 extern uint32_t Second;
 extern uint8_t TickNum;

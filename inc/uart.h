@@ -7,6 +7,12 @@ extern bool IsDevSend;
 #define DevCom USART2
 #define LoraCom USART1
 
+typedef enum
+{
+    DevUSART,
+    LoraUSART
+} USART;
+
 #define LORA_DMA_RX DMA1_Channel2
 #define LORA_DMA_TX DMA1_Channel1
 #define DEV_DMA_RX DMA1_Channel3
@@ -31,8 +37,11 @@ extern uint8_t DEV_SEND_BUFF[DEV_RECV_BUFF_SIZE];
 
 extern void SendLora(uint8_t *data, uint8_t dataLen);
 extern void SendDevice(uint8_t *data, uint8_t dataLen);
+extern void SetRS485CTL(BitAction state);
 extern int putchar(int c);
 extern int getchar(void);
 extern void showString(char *str);
+extern void ResetDMARx(USART usart);
+extern void InitUart();
 
 #endif // !__UART_H

@@ -22,19 +22,19 @@ void initLora()
     GPIO_Init(GPIOD, GPIO_Pin_0, GPIO_Mode_Out_PP_High_Fast);                           //CTRL_RELAY
 }
 
-void setHostWakeState(bool state)
+void setHostWakeState(BitAction state)
 {
     GPIO_WriteBit(GPIOB, GPIO_Pin_0, state);
 }
-void setMWakeState(bool state)
+void setMWakeState(BitAction state)
 {
     GPIO_WriteBit(GPIOB, GPIO_Pin_1, state);
 }
-void setMReloadState(bool state)
+void setMReloadState(BitAction state)
 {
     GPIO_WriteBit(GPIOB, GPIO_Pin_2, state);
 }
-void setMResetState(bool state)
+void setMResetState(BitAction state)
 {
     GPIO_WriteBit(GPIOB, GPIO_Pin_3, state);
 }

@@ -92,18 +92,25 @@ INTERRUPT_HANDLER(DMA1_CHANNEL0_1_IRQHandler, 2)
   /* In order to detect unexpected events during development,
      it is recommended to set a breakpoint on the following instruction.
   */
-  if (DMA_GetFlagStatus(DMA1_FLAG_HT0) == SET)
+  if (DMA_GetFlagStatus(DMA1_FLAG_TC0) != RESET)
   {
+    // Task *t = (Task *)malloc(sizeof(Task));
+    // t->type = DEV_SEND_COMPLETE;
+    // t->data = NULL;
+    // t->dataLen = 0;
+    PushTask(DEV_SEND_COMPLETE);
     IsDevSend = FALSE;
-    DMA_ClearFlag(DMA1_FLAG_HT0);
-    DMA_ClearITPendingBit(DMA1_IT_HT0);
+    DMA_ClearITPendingBit(DMA1_IT_TC0);
   }
-  if (DMA_GetFlagStatus(DMA1_FLAG_HT1) == SET)
+  if (DMA_GetFlagStatus(DMA1_FLAG_TC1) != RESET)
   {
+    // Task *t = (Task *)malloc(sizeof(Task));
+    // t->type = LORA_SEND_COMPLETE;
+    // t->data = NULL;
+    // t->dataLen = 0;
+    PushTask(LORA_SEND_COMPLETE);
     IsLoraSend = FALSE;
-    setRS485CTL(DISABLE);
-    DMA_ClearFlag(DMA1_FLAG_HT1);
-    DMA_ClearITPendingBit(DMA1_IT_HT1);
+    DMA_ClearITPendingBit(DMA1_IT_TC1);
   }
 }
 /**
@@ -116,6 +123,26 @@ INTERRUPT_HANDLER(DMA1_CHANNEL2_3_IRQHandler, 3)
   /* In order to detect unexpected events during development,
      it is recommended to set a breakpoint on the following instruction.
   */
+  if (DMA_GetFlagStatus(DMA1_FLAG_TC2) != RESET)
+  {
+    DMA_Cmd(LORA_DMA_RX, DISABLE);
+    uint8_t len = DMA_GetCurrDataCounter(LORA_DMA_RX);
+    bool rst = PushData(LORA_RECV_BUFF, len);
+    TaskType t = LORA_RECV_DATA;
+    PushTask(t);
+
+    DMA_ClearITPendingBit(DMA1_IT_TC2);
+  }
+
+  if (DMA_GetFlagStatus(DMA1_FLAG_TC3) != RESET)
+  {
+    DMA_Cmd(DEV_DMA_RX, DISABLE);
+    uint8_t len = DMA_GetCurrDataCounter(DEV_DMA_RX);
+    bool rst = PushData(DEV_RECV_BUFF, len);
+    TaskType t = DEV_RECV_DATA;
+    PushTask(t);
+    DMA_ClearITPendingBit(DMA1_IT_TC3);
+  }
 }
 /**
   * @brief RTC / CSS_LSE Interrupt routine.
@@ -318,16 +345,16 @@ INTERRUPT_HANDLER(TIM2_CC_USART2_RX_IRQHandler, 20)
   */
   if (USART_GetFlagStatus(DevCom, USART_FLAG_IDLE))
   {
-    uint8_t len = DMA_GetCurrDataCounter(LORA_DMA_RX);
-    //bool rst = PushData(LORA_RECV_BUFF, len);
-    uint8_t *data = (uint8_t *)malloc(len);
-    memcpy(data, LORA_RECV_BUFF, len);
-    Task *t = (Task *)malloc(sizeof(Task));
-    t->type = DEV_RECV_DATA;
-    t->data = data;
-    t->dataLen = len;
-    pushTask(t);
-    USART_ClearFlag(DevCom, USART_FLAG_IDLE);
+    DMA_Cmd(DEV_DMA_RX, DISABLE);
+    uint8_t len = DMA_GetCurrDataCounter(DEV_DMA_RX);
+    bool rst = PushData(DEV_RECV_BUFF, len);
+    TaskType t = DEV_RECV_DATA;
+    PushTask(t);
+
+    //USART_ClearFlag(DevCom, USART_FLAG_IDLE);
+    //清除 idle flag
+    USART_GetFlagStatus(DevCom, USART_FLAG_IDLE);
+    USART_ReceiveData8(DevCom);
   }
 }
 
@@ -363,19 +390,19 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_COM_IRQHandler, 23)
   /* In order to detect unexpected events during development,
      it is recommended to set a breakpoint on the following instruction.
   */
+
   if (TIM1_GetFlagStatus(TIM1_FLAG_Update))
   {
-    TIM1_ClearFlag(TIM1_FLAG_Update);
+    TIM1_ClearITPendingBit(TIM1_IT_Update);
     TickNum++;
     if (TickNum >= 50)
     {
+      TickNum = 0;
       Second++;
     }
-    Task *task = (Task *)malloc(sizeof(Task));
-    task->type = TICK;
-    task->data = NULL;
-    task->dataLen = 0;
-    pushTask(task);
+    TaskType t = TICK;
+    PushTask(t);
+    //TIM1_ClearFlag(TIM1_FLAG_Update);
   }
 }
 /**
@@ -437,16 +464,15 @@ INTERRUPT_HANDLER(USART1_RX_TIM5_CC_IRQHandler, 28)
   */
   if (USART_GetFlagStatus(LoraCom, USART_FLAG_IDLE))
   {
+    DMA_Cmd(LORA_DMA_RX, DISABLE);
     uint8_t len = DMA_GetCurrDataCounter(LORA_DMA_RX);
-    //bool rst = PushData(LORA_RECV_BUFF, len);
-    uint8_t *data = (uint8_t *)malloc(len);
-    memcpy(data, LORA_RECV_BUFF, len);
-    Task *t = (Task *)malloc(sizeof(Task));
-    t->type = LORA_RECV_DATA;
-    t->data = data;
-    t->dataLen = len;
-    pushTask(t);
-    USART_ClearFlag(LoraCom, USART_FLAG_IDLE);
+    bool rst = PushData(LORA_RECV_BUFF, len);
+    TaskType t = LORA_RECV_DATA;
+    PushTask(t);
+
+    //USART_ClearFlag(LoraCom, USART_FLAG_IDLE);
+    USART_GetFlagStatus(LoraCom, USART_FLAG_IDLE);
+    USART_ReceiveData8(DevCom);
   }
 }
 

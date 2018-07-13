@@ -2,72 +2,106 @@
 
 #include "lora.h"
 
-TaskNode *taskList;
-TaskNode *taskTail;
+#define LISTSIZE 20
+int8_t head = 0;
+int8_t tail = 0;
+int8_t listLen = 0;
+
+TaskType TaskList[LISTSIZE];
 
 void InitTask()
 {
-    taskList = NULL;
-    taskTail = NULL;
+    head = 0;
+    tail = 0;
+    listLen = 0;
 }
 
-void pushTask(Task *t)
+void PushTask(TaskType t)
 {
-    TaskNode *node = (TaskNode *)malloc(sizeof(TaskNode));
-    node->task = t;
-    node->next = NULL;
-    taskTail->next = node;
-    taskTail = taskTail->next;
-    if (taskList == NULL)
+    if (listLen >= LISTSIZE)
     {
-        taskList = node;
+        //Reset;
+        return;
+    }
+
+    TaskList[tail] = t;
+    tail++;
+    listLen++;
+
+    if (tail >= LISTSIZE && listLen <= LISTSIZE)
+    {
+        tail = 0;
     }
 }
 
-static TaskNode *popTask()
+TaskType popTask()
 {
-    if (taskList == NULL)
+    if (0 >= listLen)
     {
-        return NULL;
+        return TaskEmpty;
     }
-
-    TaskNode *node = taskList;
-    taskList = taskList->next;
-    return node;
+    TaskType t = TaskList[head];
+    head++;
+    if (head >= LISTSIZE)
+    {
+        head = 0;
+    }
+    listLen--;
+    return t;
+}
+bool IsEmptyTaskList()
+{
+    if (0 >= listLen)
+    {
+        return TRUE;
+    }
+    return FALSE;
 }
 
-static void delNode(TaskNode *node)
+void HandleTask()
 {
-    free(node->task->data);
-    node->task->data = NULL;
-    free(node);
-    node = NULL;
-}
-
-void handleTask()
-{
-    TaskNode *node = NULL;
-    Task *task = NULL;
+    TaskType task;
+    char str[50] = "second=0000,tick=00\n";
     while (1)
     {
-        node = popTask();
-        if (node == NULL)
+        while (IsEmptyTaskList()) //队列不为空
+            ;
+        task = popTask();
+        switch (task)
         {
-            continue;
-        }
+        case TICK:
+            if (TickNum == 1)
+            {
+                str[7] = '0' + Second / 1000 % 10;
+                str[8] = '0' + Second / 100 % 10;
+                str[9] = '0' + Second / 10 % 10;
+                str[10] = '0' + Second % 10;
+                str[17] = '0' + TickNum / 10;
+                str[18] = '0' + TickNum % 10;
+                SendDevice((uint8_t *)str, (uint8_t)strlen(str));
+            }
+            break;
 
-        task = node->task;
-        switch (task->type)
-        {
         case LORA_RECV_DATA:
+            ResetDMARx(LoraUSART);
+            SendDevice("LORA_RECV_DATA\n", 15);
             //SendDevice(task->data, task->dataLen);
             //SendLora(task->data, task->dataLen);
+
             break;
         case DEV_RECV_DATA:
+            ResetDMARx(DevUSART);
+            SendDevice("DEV_RECV_DATA\n", 14);
             //SendLora(task->data, task->dataLen);
-            SendDevice(task->data, task->dataLen);
+            //SendDevice(task->data, task->dataLen);
+            break;
+        case DEV_SEND_COMPLETE:
+            SetRS485CTL(RESET);
+            //SendDevice("DEV_SEND_COMPLETE\n", 19);
+            break;
+        case LORA_SEND_COMPLETE:
+            //SendDevice("LORA_SEND_COMPLETE\n", 20);
             break;
         }
-        delNode(node);
     }
 }

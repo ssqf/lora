@@ -16,7 +16,7 @@
         <ShowSource>1</ShowSource>
     </Trace1>
     <DebugChecksum>
-        <Checksum>2204157735</Checksum>
+        <Checksum>2077943754</Checksum>
     </DebugChecksum>
     <CodeCoverage>
         <Enabled>_ 0</Enabled>
@@ -90,22 +90,23 @@
         <GraphEnabled>0</GraphEnabled>
         <ShowTimeLog>1</ShowTimeLog>
     </DataSample>
-    <TermIOLog>
-        <LoggingEnabled>_ 0</LoggingEnabled>
-        <LogFile>_ ""</LogFile>
-    </TermIOLog>
+    <Breakpoints>
+        <Bp0>_ "STD_DATA" "InitDevice" 1 0 0 3 0 "" 0 ""</Bp0>
+        <Bp1>_ "STD_CODE" "{$PROJ_DIR$\src\stm8l15x_it.c}.490.1" 0 0 0 0 "" 0 ""</Bp1>
+        <Bp2>_ "STD_CODE" "{$PROJ_DIR$\src\stm8l15x_it.c}.168.1" 1 0 0 0 "" 0 ""</Bp2>
+        <Bp3>_ "STD_CODE" "{$PROJ_DIR$\src\stm8l15x_it.c}.126.3" 1 0 0 0 "" 0 ""</Bp3>
+        <Bp4>_ "STD_CODE" "{$PROJ_DIR$\src\stm8l15x_it.c}.441.1" 1 0 0 0 "" 0 ""</Bp4>
+        <Count>5</Count>
+    </Breakpoints>
     <LogFile>
         <LoggingEnabled>_ 0</LoggingEnabled>
         <LogFile>_ ""</LogFile>
         <Category>_ 0</Category>
     </LogFile>
-    <Breakpoints>
-        <Bp0>_ "STD_CODE" "{$PROJ_DIR$\src\uart.c}.103.13" 1 0 0 0 "" 0 ""</Bp0>
-        <Bp1>_ "STD_DATA" "InitDevice" 1 0 0 3 0 "" 0 ""</Bp1>
-        <Bp2>_ "STD_CODE" "{$PROJ_DIR$\main.c}.5.3" 1 0 0 0 "" 0 ""</Bp2>
-        <Bp3>_ "STD_CODE" "{$PROJ_DIR$\main.c}.14.5" 1 0 0 0 "" 0 ""</Bp3>
-        <Count>4</Count>
-    </Breakpoints>
+    <TermIOLog>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ ""</LogFile>
+    </TermIOLog>
     <Aliases>
         <Count>0</Count>
         <SuppressDialog>0</SuppressDialog>

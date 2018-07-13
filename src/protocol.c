@@ -6,7 +6,8 @@ void HandleDeviceData(uint8_t *data, uint8_t len)
 }
 
 #define BUFF_SIZE 100
-static uint8_t buff[BUFF_SIZE];
+static uint8_t Lorabuff[BUFF_SIZE];
+static uint8_t Devbuff[BUFF_SIZE];
 static uint8_t dataStartPos = 0;
 static uint8_t dataEndPos = 0;
 static uint8_t dataLen = 0;
@@ -28,7 +29,7 @@ bool PushData(uint8_t *data, uint8_t len)
 
     for (i = 0; remainDataLen > 0 && i < len; i++)
     {
-        buff[dataEndPos++] = *(data + i);
+        Lorabuff[dataEndPos++] = *(data + i);
         remainDataLen--;
         if (dataEndPos >= BUFF_SIZE)
         {
@@ -40,5 +41,9 @@ bool PushData(uint8_t *data, uint8_t len)
 }
 
 void HandleLoraData()
+{
+}
+
+void HandleDevData()
 {
 }
