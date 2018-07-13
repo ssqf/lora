@@ -128,7 +128,7 @@ void SendDevice(uint8_t *data, uint8_t dataLen)
         DMA_SetCurrDataCounter(DEV_DMA_TX, len);
         DMA_Cmd(DEV_DMA_TX, ENABLE);
         SetRS485CTL(SET);
-        USART_DMACmd(DevCom, USART_DMAReq_TX, ENABLE);
+        //USART_DMACmd(DevCom, USART_DMAReq_TX, ENABLE);
         pos = pos + len;
         remainLen = remainLen - len;
     }
@@ -146,7 +146,7 @@ void SendLora(uint8_t *data, uint8_t dataLen)
         DMA_Cmd(LORA_DMA_TX, DISABLE);
         DMA_SetCurrDataCounter(LORA_DMA_TX, len);
         DMA_Cmd(LORA_DMA_TX, ENABLE);
-        USART_DMACmd(LoraCom, USART_DMAReq_TX, ENABLE);
+        //USART_DMACmd(LoraCom, USART_DMAReq_TX, ENABLE);
         pos = pos + len;
         remainLen = remainLen - len;
     }

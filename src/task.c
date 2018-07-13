@@ -91,6 +91,8 @@ void HandleTask()
             PushTask(LORA_DATA_SEND);
             break;
         case DEV_SEND_COMPLETE:
+            while (USART_GetFlagStatus(DevCom, USART_FLAG_TC) != SET) //DMA 完成不等于串口发送完成，要等待串口发送完成，不然丢数据
+                ;
             SetRS485CTL(RESET);
             break;
         case LORA_SEND_COMPLETE:
