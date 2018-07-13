@@ -84,14 +84,14 @@ void HandleTask()
 
         case LORA_RECV_DATA:
             ResetDMARx(LoraUSART);
-            SendDevice("LORA_RECV_DATA\n", 15);
+            SendDevice("LORA_RECV_DATA\n", 16);
             //SendDevice(task->data, task->dataLen);
             //SendLora(task->data, task->dataLen);
 
             break;
         case DEV_RECV_DATA:
             ResetDMARx(DevUSART);
-            SendDevice("DEV_RECV_DATA\n", 14);
+            SendDevice("DEV_RECV_DATA\n", 15);
             //SendLora(task->data, task->dataLen);
             //SendDevice(task->data, task->dataLen);
             break;

@@ -79,10 +79,10 @@ static void initDeviceUart()
     USART_SetPrescaler(DevCom, 1);
 
     /* Configure USART Rx as alternate function push-pull  (software pull up)*/
-    //GPIO_ExternalPullUpConfig(GPIOE, GPIO_Pin_3, ENABLE);
-    //GPIO_ExternalPullUpConfig(GPIOE, GPIO_Pin_4, ENABLE);
+    GPIO_ExternalPullUpConfig(GPIOE, GPIO_Pin_3, ENABLE);
+    GPIO_ExternalPullUpConfig(GPIOE, GPIO_Pin_4, ENABLE);
 
-    USART_Init(DevCom, DevBaudRate, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Tx| USART_Mode_Rx);
+    USART_Init(DevCom, DevBaudRate, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Rx | USART_Mode_Tx);
     //USART_Init(DevCom, DevBaudRate, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Rx);
     //USART_DMACmd(DevCom, USART_DMAReq_TX | USART_DMAReq_RX, ENABLE);
     //USART_ITConfig(DevCom, USART_IT_IDLE, ENABLE);
@@ -96,8 +96,8 @@ static void initLoraUart()
     USART_SetPrescaler(LoraCom, 1);
 
     /* Configure USART Rx as alternate function push-pull  (software pull up)*/
-    //GPIO_ExternalPullUpConfig(GPIOC, GPIO_Pin_2, ENABLE);
-    //GPIO_ExternalPullUpConfig(GPIOC, GPIO_Pin_3, ENABLE);
+    GPIO_ExternalPullUpConfig(GPIOC, GPIO_Pin_2, ENABLE);
+    GPIO_ExternalPullUpConfig(GPIOC, GPIO_Pin_3, ENABLE);
 
     USART_Init(LoraCom, LoraBaudRate, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Rx | USART_Mode_Tx);
     //USART_DMACmd(LoraCom, USART_DMAReq_TX | USART_DMAReq_RX, ENABLE);

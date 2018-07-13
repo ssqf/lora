@@ -16,7 +16,7 @@
         <ShowSource>1</ShowSource>
     </Trace1>
     <DebugChecksum>
-        <Checksum>2077943754</Checksum>
+        <Checksum>4246982393</Checksum>
     </DebugChecksum>
     <CodeCoverage>
         <Enabled>_ 0</Enabled>
@@ -28,56 +28,6 @@
     <CallStack>
         <ShowArgs>0</ShowArgs>
     </CallStack>
-    <DriverProfiling>
-        <Enabled>0</Enabled>
-        <Mode>1</Mode>
-        <Graph>0</Graph>
-        <Symbiont>0</Symbiont>
-        <Exclusions />
-    </DriverProfiling>
-    <CallStackLog>
-        <Enabled>0</Enabled>
-    </CallStackLog>
-    <CallStackStripe>
-        <ShowTiming>1</ShowTiming>
-    </CallStackStripe>
-    <InterruptLog>
-        <LogEnabled>0</LogEnabled>
-        <GraphEnabled>0</GraphEnabled>
-        <ShowTimeLog>1</ShowTimeLog>
-        <SumEnabled>0</SumEnabled>
-        <ShowTimeSum>1</ShowTimeSum>
-        <SumSortOrder>0</SumSortOrder>
-    </InterruptLog>
-    <DataLog>
-        <LogEnabled>0</LogEnabled>
-        <GraphEnabled>0</GraphEnabled>
-        <ShowTimeLog>1</ShowTimeLog>
-        <SumEnabled>0</SumEnabled>
-        <ShowTimeSum>1</ShowTimeSum>
-    </DataLog>
-    <Breakpoints2>
-        <Bp0>_ 0 "STD_CODE2" "{d:\documents\lora\libs\src\stm8l10x_i2c.c}.226.1" 0 0 1 "" 0 ""</Bp0>
-        <Bp1>_ 0 "STD_CODE2" "{$PROJ_DIR$\inc\config.h}.26.1" 0 0 1 "" 0 ""</Bp1>
-        <Bp2>_ 1 "STD_CODE2" "{$PROJ_DIR$\main.c}.5.3" 0 0 1 "" 0 ""</Bp2>
-        <Bp3>_ 1 "STD_CODE2" "{$PROJ_DIR$\src\stm8l15x_it.c}.303.3" 0 0 1 "" 0 ""</Bp3>
-        <Count>4</Count>
-    </Breakpoints2>
-    <Interrupts>
-        <Enabled>1</Enabled>
-    </Interrupts>
-    <MemConfig>
-        <Base>1</Base>
-        <Manual>0</Manual>
-        <Ddf>1</Ddf>
-        <TypeViol>0</TypeViol>
-        <Stop>1</Stop>
-    </MemConfig>
-    <Simulator>
-        <Freq>16000000</Freq>
-        <FreqHi>0</FreqHi>
-        <MultiCoreRunAll>1</MultiCoreRunAll>
-    </Simulator>
     <BreakpointUsageDialog>
         <Placement>_ 738 384 1183 667</Placement>
     </BreakpointUsageDialog>
@@ -98,6 +48,23 @@
         <Bp4>_ "STD_CODE" "{$PROJ_DIR$\src\stm8l15x_it.c}.441.1" 1 0 0 0 "" 0 ""</Bp4>
         <Count>5</Count>
     </Breakpoints>
+    <DebuggerSettings>
+        <DisableInterruptsWhenStepping>0</DisableInterruptsWhenStepping>
+        <LeaveTargetRunning>0</LeaveTargetRunning>
+    </DebuggerSettings>
+    <DriverProfiling>
+        <Enabled>0</Enabled>
+        <Mode>1</Mode>
+        <Graph>0</Graph>
+        <Symbiont>0</Symbiont>
+        <Exclusions />
+    </DriverProfiling>
+    <CallStackLog>
+        <Enabled>0</Enabled>
+    </CallStackLog>
+    <CallStackStripe>
+        <ShowTiming>1</ShowTiming>
+    </CallStackStripe>
     <LogFile>
         <LoggingEnabled>_ 0</LoggingEnabled>
         <LogFile>_ ""</LogFile>
@@ -107,12 +74,45 @@
         <LoggingEnabled>_ 0</LoggingEnabled>
         <LogFile>_ ""</LogFile>
     </TermIOLog>
+    <InterruptLog>
+        <LogEnabled>0</LogEnabled>
+        <GraphEnabled>0</GraphEnabled>
+        <ShowTimeLog>1</ShowTimeLog>
+        <SumEnabled>0</SumEnabled>
+        <ShowTimeSum>1</ShowTimeSum>
+        <SumSortOrder>0</SumSortOrder>
+    </InterruptLog>
+    <DataLog>
+        <LogEnabled>0</LogEnabled>
+        <GraphEnabled>0</GraphEnabled>
+        <ShowTimeLog>1</ShowTimeLog>
+        <SumEnabled>0</SumEnabled>
+        <ShowTimeSum>1</ShowTimeSum>
+    </DataLog>
+    <Breakpoints2>
+        <Bp0>_ 0 "STD_CODE2" "{d:\documents\lora\libs\src\stm8l10x_i2c.c}.226.1" 0 0 1 "" 0 ""</Bp0>
+        <Bp1>_ 0 "STD_CODE2" "{$PROJ_DIR$\inc\config.h}.26.1" 0 0 1 "" 0 ""</Bp1>
+        <Bp2>_ 1 "STD_CODE2" "{$PROJ_DIR$\main.c}.5.3" 0 0 1 "" 0 ""</Bp2>
+        <Bp3>_ 1 "STD_CODE2" "{$PROJ_DIR$\src\stm8l15x_it.c}.310.1" 0 0 1 "" 0 ""</Bp3>
+        <Count>4</Count>
+    </Breakpoints2>
+    <Interrupts>
+        <Enabled>1</Enabled>
+    </Interrupts>
+    <MemConfig>
+        <Base>1</Base>
+        <Manual>0</Manual>
+        <Ddf>1</Ddf>
+        <TypeViol>0</TypeViol>
+        <Stop>1</Stop>
+    </MemConfig>
     <Aliases>
         <Count>0</Count>
         <SuppressDialog>0</SuppressDialog>
     </Aliases>
-    <DebuggerSettings>
-        <DisableInterruptsWhenStepping>0</DisableInterruptsWhenStepping>
-        <LeaveTargetRunning>0</LeaveTargetRunning>
-    </DebuggerSettings>
+    <Simulator>
+        <Freq>16000000</Freq>
+        <FreqHi>0</FreqHi>
+        <MultiCoreRunAll>1</MultiCoreRunAll>
+    </Simulator>
 </settings>
