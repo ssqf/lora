@@ -7,6 +7,7 @@
 #include "uart.h"
 #include "init.h"
 #include "clock.h"
+#include "protocol.h"
 
 //#define NULL ((void *)0)
 

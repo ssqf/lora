@@ -1,6 +1,6 @@
 //串口相关处理
 
-#include "lora.h"
+#include "uart.h"
 
 // uint8_t LoraRxBuff[100] = {0};
 // uint8_t LoraTxBuff[100] = {0};
@@ -19,6 +19,11 @@ static void initLoraUart();
 static void initRS458CTL();
 void initUart3();
 
+uint8_t LORA_RECV_BUFF[LORA_RECV_BUFF_SIZE];
+uint8_t LORA_SEND_BUFF[LORA_SEND_BUFF_SIZE];
+uint8_t DEV_RECV_BUFF[DEV_RECV_BUFF_SIZE];
+uint8_t DEV_SEND_BUFF[DEV_SEND_BUFF_SIZE];
+
 void InitUart()
 {
     initRS458CTL();
@@ -29,11 +34,6 @@ void InitUart()
     USART_Cmd(DevCom, ENABLE);
     USART_Cmd(LoraCom, ENABLE);
 }
-
-uint8_t LORA_RECV_BUFF[LORA_RECV_BUFF_SIZE];
-uint8_t LORA_SEND_BUFF[LORA_SEND_BUFF_SIZE];
-uint8_t DEV_RECV_BUFF[DEV_RECV_BUFF_SIZE];
-uint8_t DEV_SEND_BUFF[DEV_SEND_BUFF_SIZE];
 
 static void initDMA()
 {
@@ -57,25 +57,30 @@ static void initDMA()
              DMA_DIR_MemoryToPeripheral, DMA_Mode_Normal, DMA_MemoryIncMode_Inc,
              DMA_Priority_Low, DMA_MemoryDataSize_Byte);
 
+    USART_DMACmd(DevCom, USART_DMAReq_TX, ENABLE);
+    USART_DMACmd(DevCom, USART_DMAReq_RX, ENABLE);
+    USART_DMACmd(LoraCom, USART_DMAReq_TX, ENABLE);
+    USART_DMACmd(LoraCom, USART_DMAReq_RX, ENABLE);
+
     DMA_ITConfig(LORA_DMA_RX, DMA_ITx_TC, ENABLE);
     DMA_ITConfig(LORA_DMA_TX, DMA_ITx_TC, ENABLE);
     DMA_ITConfig(DEV_DMA_RX, DMA_ITx_TC, ENABLE);
     DMA_ITConfig(DEV_DMA_TX, DMA_ITx_TC, ENABLE);
 
     DMA_Cmd(LORA_DMA_RX, ENABLE);
-    DMA_Cmd(LORA_DMA_TX, DISABLE);
+    DMA_Cmd(LORA_DMA_TX, ENABLE);
     DMA_Cmd(DEV_DMA_RX, ENABLE);
-    DMA_Cmd(DEV_DMA_TX, DISABLE);
+    DMA_Cmd(DEV_DMA_TX, ENABLE);
+
+    DMA_GlobalCmd(ENABLE);
 
     USART_DMACmd(LoraCom, USART_DMAReq_RX, ENABLE);
     USART_DMACmd(DevCom, USART_DMAReq_RX, ENABLE);
-
-    DMA_GlobalCmd(ENABLE);
 }
 
 static void initDeviceUart()
 {
-    USART_ClockInit(DevCom, USART_Clock_Enable, USART_CPOL_Low, USART_CPHA_1Edge, USART_LastBit_Disable);
+    //USART_ClockInit(DevCom, USART_Clock_Enable, USART_CPOL_Low, USART_CPHA_1Edge, USART_LastBit_Disable);
     USART_SetPrescaler(DevCom, 1);
 
     /* Configure USART Rx as alternate function push-pull  (software pull up)*/
@@ -84,15 +89,16 @@ static void initDeviceUart()
 
     USART_Init(DevCom, DevBaudRate, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Rx | USART_Mode_Tx);
     //USART_Init(DevCom, DevBaudRate, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Rx);
-    //USART_DMACmd(DevCom, USART_DMAReq_TX | USART_DMAReq_RX, ENABLE);
-    //USART_ITConfig(DevCom, USART_IT_IDLE, ENABLE);
+    //USART_DMACmd(DevCom, USART_DMAReq_TX, ENABLE);
+    //USART_DMACmd(DevCom, USART_DMAReq_RX, ENABLE);
+    USART_ITConfig(DevCom, USART_IT_IDLE, ENABLE);
     //USART_ITConfig(DevCom, USART_IT_TC, ENABLE);
-    USART_Cmd(DevCom, ENABLE);
+    USART_Cmd(DevCom, DISABLE);
 }
 
 static void initLoraUart()
 {
-    USART_ClockInit(LoraCom, USART_Clock_Enable, USART_CPOL_Low, USART_CPHA_1Edge, USART_LastBit_Disable);
+    //USART_ClockInit(LoraCom, USART_Clock_Enable, USART_CPOL_Low, USART_CPHA_1Edge, USART_LastBit_Disable);
     USART_SetPrescaler(LoraCom, 1);
 
     /* Configure USART Rx as alternate function push-pull  (software pull up)*/
@@ -100,10 +106,11 @@ static void initLoraUart()
     GPIO_ExternalPullUpConfig(GPIOC, GPIO_Pin_3, ENABLE);
 
     USART_Init(LoraCom, LoraBaudRate, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Rx | USART_Mode_Tx);
-    //USART_DMACmd(LoraCom, USART_DMAReq_TX | USART_DMAReq_RX, ENABLE);
-    //USART_ITConfig(LoraCom, USART_IT_IDLE, ENABLE);
+    //USART_DMACmd(LoraCom, USART_DMAReq_TX, ENABLE);
+    //USART_DMACmd(LoraCom, USART_DMAReq_RX, ENABLE);
+    USART_ITConfig(LoraCom, USART_IT_IDLE, ENABLE);
     //USART_ITConfig(LoraCom, USART_IT_TC, ENABLE);
-    USART_Cmd(DevCom, ENABLE);
+    USART_Cmd(DevCom, DISABLE);
 }
 
 void SendDevice(uint8_t *data, uint8_t dataLen)
@@ -113,8 +120,7 @@ void SendDevice(uint8_t *data, uint8_t dataLen)
     uint8_t remainLen = dataLen;
     while (0 != remainLen)
     {
-        while (IsDevSend)
-            ; //等待发送结束
+        //while (IsDevSend); //等待发送结束
 
         len = DEV_SEND_BUFF_SIZE <= remainLen ? DEV_SEND_BUFF_SIZE : remainLen;
         memcpy(DEV_SEND_BUFF, data + pos, len);
@@ -125,7 +131,6 @@ void SendDevice(uint8_t *data, uint8_t dataLen)
         USART_DMACmd(DevCom, USART_DMAReq_TX, ENABLE);
         pos = pos + len;
         remainLen = remainLen - len;
-        IsDevSend = TRUE;
     }
 }
 
@@ -136,10 +141,6 @@ void SendLora(uint8_t *data, uint8_t dataLen)
     uint8_t remainLen = dataLen;
     while (0 != remainLen)
     {
-        while (IsLoraSend) //等待发送结束
-        {
-        }
-
         len = LORA_SEND_BUFF_SIZE <= remainLen ? LORA_SEND_BUFF_SIZE : remainLen;
         memcpy(LORA_SEND_BUFF, data + pos, len);
         DMA_Cmd(LORA_DMA_TX, DISABLE);
@@ -148,7 +149,6 @@ void SendLora(uint8_t *data, uint8_t dataLen)
         USART_DMACmd(LoraCom, USART_DMAReq_TX, ENABLE);
         pos = pos + len;
         remainLen = remainLen - len;
-        IsLoraSend = TRUE;
     }
 }
 
@@ -180,21 +180,28 @@ void initUart3()
     USART_Cmd(USART3, ENABLE);
 }
 
-void ResetDMARx(USART usart)
+void ResetDevRx()
 {
-    if (usart == DevUSART)
-    {
-        DMA_SetCurrDataCounter(DEV_DMA_RX, DEV_RECV_BUFF_SIZE);
-        DMA_Cmd(DEV_DMA_RX, ENABLE);
-        USART_DMACmd(DevCom, USART_DMAReq_RX, ENABLE);
-    }
+    DMA_Cmd(DEV_DMA_RX, DISABLE);
+    DMA_SetCurrDataCounter(DEV_DMA_RX, DEV_RECV_BUFF_SIZE);
+    DMA_Cmd(DEV_DMA_RX, ENABLE);
+    //USART_DMACmd(DevCom, USART_DMAReq_RX, ENABLE);
+    DevCom->SR;
+    DevCom->DR;
+    DMA_ClearITPendingBit(DEV_DMA_FLAG_TCRX);
+    USART_ClearFlag(DevCom, USART_FLAG_IDLE);
+}
 
-    if (usart == LoraUSART)
-    {
-        DMA_SetCurrDataCounter(LORA_DMA_RX, LORA_RECV_BUFF_SIZE);
-        DMA_Cmd(LORA_DMA_RX, ENABLE);
-        USART_DMACmd(LoraCom, USART_DMAReq_RX, ENABLE);
-    }
+void ResetLoraRx()
+{
+    DMA_Cmd(LORA_DMA_RX, DISABLE);
+    DMA_SetCurrDataCounter(LORA_DMA_RX, LORA_RECV_BUFF_SIZE);
+    DMA_Cmd(LORA_DMA_RX, ENABLE);
+    //USART_DMACmd(LoraCom, USART_DMAReq_RX, ENABLE);
+    LoraCom->SR;
+    LoraCom->DR;
+    DMA_ClearITPendingBit(LORA_DMA_FLAG_TCRX);
+    USART_ClearFlag(LoraCom, USART_FLAG_IDLE);
 }
 
 int putchar(int c)

@@ -70,7 +70,7 @@ void HandleTask()
         switch (task)
         {
         case TICK:
-            if (TickNum == 1)
+            if (TickNum == 1 && Second % 5 == 0)
             {
                 str[7] = '0' + Second / 1000 % 10;
                 str[8] = '0' + Second / 100 % 10;
@@ -83,24 +83,17 @@ void HandleTask()
             break;
 
         case LORA_RECV_DATA:
-            ResetDMARx(LoraUSART);
-            SendDevice("LORA_RECV_DATA\n", 16);
-            //SendDevice(task->data, task->dataLen);
-            //SendLora(task->data, task->dataLen);
 
+            //SendDevice("LORA_RECV_DATA\n", 16);
             break;
         case DEV_RECV_DATA:
-            ResetDMARx(DevUSART);
-            SendDevice("DEV_RECV_DATA\n", 15);
-            //SendLora(task->data, task->dataLen);
-            //SendDevice(task->data, task->dataLen);
+            HandleDevData();
+            //SendDevice("DEV_RECV_DATA\n", 15);
             break;
         case DEV_SEND_COMPLETE:
             SetRS485CTL(RESET);
-            //SendDevice("DEV_SEND_COMPLETE\n", 19);
             break;
         case LORA_SEND_COMPLETE:
-            //SendDevice("LORA_SEND_COMPLETE\n", 20);
             break;
         }
     }

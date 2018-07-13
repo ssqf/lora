@@ -94,22 +94,13 @@ INTERRUPT_HANDLER(DMA1_CHANNEL0_1_IRQHandler, 2)
   */
   if (DMA_GetFlagStatus(DMA1_FLAG_TC0) != RESET)
   {
-    // Task *t = (Task *)malloc(sizeof(Task));
-    // t->type = DEV_SEND_COMPLETE;
-    // t->data = NULL;
-    // t->dataLen = 0;
     PushTask(DEV_SEND_COMPLETE);
-    IsDevSend = FALSE;
     DMA_ClearITPendingBit(DMA1_IT_TC0);
   }
   if (DMA_GetFlagStatus(DMA1_FLAG_TC1) != RESET)
   {
-    // Task *t = (Task *)malloc(sizeof(Task));
-    // t->type = LORA_SEND_COMPLETE;
-    // t->data = NULL;
-    // t->dataLen = 0;
+
     PushTask(LORA_SEND_COMPLETE);
-    IsLoraSend = FALSE;
     DMA_ClearITPendingBit(DMA1_IT_TC1);
   }
 }
@@ -123,25 +114,24 @@ INTERRUPT_HANDLER(DMA1_CHANNEL2_3_IRQHandler, 3)
   /* In order to detect unexpected events during development,
      it is recommended to set a breakpoint on the following instruction.
   */
-  if (DMA_GetFlagStatus(DMA1_FLAG_TC2) != RESET)
+  //LORA DMA 接收数据完成
+  if (DMA_GetFlagStatus(LORA_DMA_FLAG_TCRX) != RESET)
   {
-    DMA_Cmd(LORA_DMA_RX, DISABLE);
-    uint8_t len = DMA_GetCurrDataCounter(LORA_DMA_RX);
-    bool rst = PushData(LORA_RECV_BUFF, len);
+    uint8_t len = LORA_RECV_BUFF_SIZE - DMA_GetCurrDataCounter(LORA_DMA_RX);
+    bool rst = PushDataLoraBuff(LORA_RECV_BUFF, len);
     TaskType t = LORA_RECV_DATA;
     PushTask(t);
-
-    DMA_ClearITPendingBit(DMA1_IT_TC2);
+    ResetLoraRx();
   }
 
-  if (DMA_GetFlagStatus(DMA1_FLAG_TC3) != RESET)
+  //DEV DMA 接收数据完成
+  if (DMA_GetFlagStatus(DEV_DMA_FLAG_TCRX) != RESET)
   {
-    DMA_Cmd(DEV_DMA_RX, DISABLE);
-    uint8_t len = DMA_GetCurrDataCounter(DEV_DMA_RX);
-    bool rst = PushData(DEV_RECV_BUFF, len);
+    uint8_t len = DEV_RECV_BUFF_SIZE - DMA_GetCurrDataCounter(DEV_DMA_RX);
+    bool rst = PushDataDevBuff(DEV_RECV_BUFF, len);
     TaskType t = DEV_RECV_DATA;
     PushTask(t);
-    DMA_ClearITPendingBit(DMA1_IT_TC3);
+    ResetDevRx();
   }
 }
 /**
@@ -345,16 +335,11 @@ INTERRUPT_HANDLER(TIM2_CC_USART2_RX_IRQHandler, 20)
   */
   if (USART_GetFlagStatus(DevCom, USART_FLAG_IDLE))
   {
-    DMA_Cmd(DEV_DMA_RX, DISABLE);
-    uint8_t len = DMA_GetCurrDataCounter(DEV_DMA_RX);
-    bool rst = PushData(DEV_RECV_BUFF, len);
+    uint8_t len = DEV_RECV_BUFF_SIZE - DMA_GetCurrDataCounter(DEV_DMA_RX);
+    bool rst = PushDataDevBuff(DEV_RECV_BUFF, len);
     TaskType t = DEV_RECV_DATA;
     PushTask(t);
-
-    //USART_ClearFlag(DevCom, USART_FLAG_IDLE);
-    //清除 idle flag
-    USART_GetFlagStatus(DevCom, USART_FLAG_IDLE);
-    USART_ReceiveData8(DevCom);
+    ResetDevRx();
   }
 }
 
@@ -464,15 +449,11 @@ INTERRUPT_HANDLER(USART1_RX_TIM5_CC_IRQHandler, 28)
   */
   if (USART_GetFlagStatus(LoraCom, USART_FLAG_IDLE))
   {
-    DMA_Cmd(LORA_DMA_RX, DISABLE);
-    uint8_t len = DMA_GetCurrDataCounter(LORA_DMA_RX);
-    bool rst = PushData(LORA_RECV_BUFF, len);
+    uint8_t len = LORA_RECV_BUFF_SIZE - DMA_GetCurrDataCounter(LORA_DMA_RX);
+    bool rst = PushDataLoraBuff(LORA_RECV_BUFF, len);
     TaskType t = LORA_RECV_DATA;
     PushTask(t);
-
-    //USART_ClearFlag(LoraCom, USART_FLAG_IDLE);
-    USART_GetFlagStatus(LoraCom, USART_FLAG_IDLE);
-    USART_ReceiveData8(DevCom);
+    ResetLoraRx();
   }
 }
 
