@@ -1608,6 +1608,12 @@
     <group>
         <name>inc</name>
         <file>
+            <name>$PROJ_DIR$\inc\at_cmd.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\inc\clock.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\inc\config.h</name>
         </file>
         <file>

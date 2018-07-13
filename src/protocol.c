@@ -1,9 +1,6 @@
 //协议的处理
 //需要数据：1、sn；2、包序列号；3、ack确认；
 #include "protocol.h"
-void HandleDeviceData(uint8_t *data, uint8_t len)
-{
-}
 
 #define BUFF_SIZE 100
 static uint8_t Lorabuff[BUFF_SIZE];
@@ -70,22 +67,58 @@ void HandleLoraDate()
 {
 }
 
-uint8_t DevData[BUFF_SIZE];
-
+uint8_t SendLoraData[BUFF_SIZE];
+uint8_t SendLoraDataLen = 0;
 void HandleDevData()
 {
     uint8_t i = 0;
     uint8_t j = 0;
     uint8_t k = 0;
-    for (i = DevDataStartPos, j = 0, k = DevDataStartPos; i < (BUFF_SIZE - DevRemainDataLen); i++)
+    uint8_t len = BUFF_SIZE - DevRemainDataLen;
+    for (i = 0, j = 0, k = DevDataStartPos; i < len; i++)
     {
         if (k >= BUFF_SIZE)
         {
             k = 0;
         }
-        DevData[j++] = Devbuff[k++];
+        SendLoraData[j++] = Devbuff[k++];
     }
     DevDataStartPos = k;
     DevRemainDataLen += i;
-    SendDevice(DevData, i);
+    SendLoraDataLen = i;
+    //SendLora(SendLoraData, SendLoraDataLen);
+}
+
+uint8_t SendDevData[BUFF_SIZE];
+uint8_t SendDevDataLen = 0;
+
+void HandleLoraData()
+{
+    uint8_t i = 0;
+    uint8_t j = 0;
+    uint8_t k = 0;
+    uint8_t len = BUFF_SIZE - LoraRemainDataLen;
+    for (i = 0, j = 0, k = LoraDataStartPos; i < len; i++)
+    {
+        if (k >= BUFF_SIZE)
+        {
+            k = 0;
+        }
+        SendDevData[j++] = Lorabuff[k++];
+    }
+    LoraDataStartPos = k;
+    LoraRemainDataLen += i;
+    SendDevDataLen = i;
+    SendDevice(SendDevData, SendDevDataLen);
+    SendDevDataLen = 0;
+}
+
+void HandSendLoarData()
+{
+    if (0 == SendLoraDataLen)
+    {
+        return;
+    }
+    SendLora(SendLoraData, SendLoraDataLen);
+    SendLoraDataLen = 0;
 }

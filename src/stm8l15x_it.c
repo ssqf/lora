@@ -321,6 +321,12 @@ INTERRUPT_HANDLER(TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler, 19)
   /* In order to detect unexpected events during development,
      it is recommended to set a breakpoint on the following instruction.
   */
+  if (TIM2_GetITStatus(TIM2_IT_Update) == SET)
+  {
+    TIM2_ClearITPendingBit(TIM2_IT_Update);
+    TIM2_Cmd(DISABLE);
+    PushTask(LORA_DATA_SEND);
+  }
 }
 
 /**

@@ -1,18 +1,18 @@
 #include "lora.h"
 
-void setLoraSerial()
+void SetLoraSerial()
 {
 }
 
-void getLoraSerial()
+void GetLoraSerial()
 {
 }
 
-void setLoraAddr(uint16_t addr)
+void SetLoraAddr(uint16_t addr)
 {
 }
 
-void setLoraChan(uint8_t chan)
+void SetLoraChan(uint8_t chan)
 {
 }
 
@@ -22,19 +22,19 @@ void initLora()
     GPIO_Init(GPIOD, GPIO_Pin_0, GPIO_Mode_Out_PP_High_Fast);                           //CTRL_RELAY
 }
 
-void setHostWakeState(BitAction state)
+void SetHostWakeState(BitAction state)
 {
     GPIO_WriteBit(GPIOB, GPIO_Pin_0, state);
 }
-void setMWakeState(BitAction state)
+void SetWakeState(BitAction state)
 {
     GPIO_WriteBit(GPIOB, GPIO_Pin_1, state);
 }
-void setMReloadState(BitAction state)
+void SetReloadState(BitAction state)
 {
     GPIO_WriteBit(GPIOB, GPIO_Pin_2, state);
 }
-void setMResetState(BitAction state)
+void SetResetState(BitAction state)
 {
     GPIO_WriteBit(GPIOB, GPIO_Pin_3, state);
 }

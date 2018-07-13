@@ -70,30 +70,34 @@ void HandleTask()
         switch (task)
         {
         case TICK:
-            if (TickNum == 1 && Second % 5 == 0)
-            {
-                str[7] = '0' + Second / 1000 % 10;
-                str[8] = '0' + Second / 100 % 10;
-                str[9] = '0' + Second / 10 % 10;
-                str[10] = '0' + Second % 10;
-                str[17] = '0' + TickNum / 10;
-                str[18] = '0' + TickNum % 10;
-                SendDevice((uint8_t *)str, (uint8_t)strlen(str));
-            }
+            // if (TickNum == 1 && Second % 5 == 0)
+            // {
+            //     str[7] = '0' + Second / 1000 % 10;
+            //     str[8] = '0' + Second / 100 % 10;
+            //     str[9] = '0' + Second / 10 % 10;
+            //     str[10] = '0' + Second % 10;
+            //     str[17] = '0' + TickNum / 10;
+            //     str[18] = '0' + TickNum % 10;
+            //     SendDevice((uint8_t *)str, (uint8_t)strlen(str));
+            // }
             break;
 
         case LORA_RECV_DATA:
-
+            HandleLoraData();
             //SendDevice("LORA_RECV_DATA\n", 16);
             break;
         case DEV_RECV_DATA:
             HandleDevData();
-            //SendDevice("DEV_RECV_DATA\n", 15);
+            PushTask(LORA_DATA_SEND);
             break;
         case DEV_SEND_COMPLETE:
             SetRS485CTL(RESET);
             break;
         case LORA_SEND_COMPLETE:
+            //SetHostWakeState(RESET);
+            break;
+        case LORA_DATA_SEND:
+            HandSendLoarData();
             break;
         }
     }

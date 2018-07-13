@@ -48,5 +48,6 @@ extern void showString(char *str);
 extern void InitUart();
 extern void ResetDevRx();
 extern void ResetLoraRx();
+extern void SetLoraReadySend();
 
 #endif // !__UART_H

@@ -9,22 +9,11 @@ typedef enum
     LORA_RECV_DATA,
     DEV_RECV_DATA,
     LORA_SEND_COMPLETE,
-    DEV_SEND_COMPLETE
+    DEV_SEND_COMPLETE,
+    LORA_DATA_SEND,
+
 } TaskType;
 
-// typedef struct
-// {
-//     TaskType type;
-//     uint8_t *data;
-//     uint8_t dataLen;
-// } Task;
-
-// typedef struct Node
-// {
-//     Task *task;
-//     struct Node *next;
-// } TaskNode;
-// extern void InitTask();
 extern void HandleTask();
 extern void PushTask(TaskType t);
 extern void InitTask();

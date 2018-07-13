@@ -24,8 +24,9 @@ void initCLK()
 
     CLK_RTCClockConfig(CLK_RTCCLKSource_HSE, CLK_RTCCLKDiv_64); //16MHz/64=25KHz
 
-    // 使能TIM2 uart1 uart2 和TRC
+    // 使能TIM1 TIM2 uart1 uart2 和TRC
     CLK_PeripheralClockConfig(CLK_Peripheral_TIM1, ENABLE);
+    CLK_PeripheralClockConfig(CLK_Peripheral_TIM2, ENABLE);
     CLK_PeripheralClockConfig(CLK_Peripheral_USART1, ENABLE);
     CLK_PeripheralClockConfig(CLK_Peripheral_USART2, ENABLE);
     CLK_PeripheralClockConfig(CLK_Peripheral_USART3, ENABLE); //串口3做调试

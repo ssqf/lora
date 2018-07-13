@@ -8,6 +8,7 @@
 #include "init.h"
 #include "clock.h"
 #include "protocol.h"
+#include "at_cmd.h"
 
 //#define NULL ((void *)0)
 

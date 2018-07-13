@@ -163,6 +163,12 @@ void SetRS485CTL(BitAction state)
     GPIO_WriteBit(GPIOE, GPIO_Pin_2, state);
 }
 
+void SetLoraReadySend()
+{
+    SetMWakeState(RESET);
+    Delay5ms();
+}
+
 void initUart3()
 {
     SYSCFG_REMAPPinConfig(REMAP_Pin_USART3TxRxPortF, ENABLE);
