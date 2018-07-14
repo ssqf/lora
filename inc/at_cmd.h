@@ -1,4 +1,6 @@
 #ifndef __AT_CMD_H
 #define __AT_CMD_H
-void SetHostWakeState(BitAction state);
+extern void SetHostWakeState(BitAction state);
+extern void EnterLoraConfMode();
+extern void ATCMD_EnterLoraConfMode();
 #endif // !__AT_CMD_H#define

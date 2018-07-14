@@ -14,6 +14,8 @@ static uint8_t LoraDataEndPos = 0;
 static uint8_t LoraDataLen = 0;
 static uint8_t LoraRemainDataLen = BUFF_SIZE;
 
+static bool isEnterLoraConfig(uint8_t *data, uint8_t len);
+
 uint8_t GetBuffRemainLen()
 {
     return LoraRemainDataLen;
@@ -86,7 +88,12 @@ void HandleDevData()
     DevDataStartPos = k;
     DevRemainDataLen += i;
     SendLoraDataLen = i;
+    if (isEnterLoraConfig(SendLoraData, SendLoraDataLen))
+    {
+        EnterLoraConfMode();
+    }
     //SendLora(SendLoraData, SendLoraDataLen);
+    SetLoraReadySend();
 }
 
 uint8_t SendDevData[BUFF_SIZE];
@@ -98,6 +105,7 @@ void HandleLoraData()
     uint8_t j = 0;
     uint8_t k = 0;
     uint8_t len = BUFF_SIZE - LoraRemainDataLen;
+
     for (i = 0, j = 0, k = LoraDataStartPos; i < len; i++)
     {
         if (k >= BUFF_SIZE)
@@ -109,6 +117,7 @@ void HandleLoraData()
     LoraDataStartPos = k;
     LoraRemainDataLen += i;
     SendDevDataLen = i;
+
     SendDevice(SendDevData, SendDevDataLen);
     SendDevDataLen = 0;
 }
@@ -121,4 +130,17 @@ void HandSendLoarData()
     }
     SendLora(SendLoraData, SendLoraDataLen);
     SendLoraDataLen = 0;
+}
+
+static bool isEnterLoraConfig(uint8_t *data, uint8_t len)
+{
+    if (len < 3)
+    {
+        return FALSE;
+    }
+    if (strncmp(data, "+++", 3) == 0)
+    {
+        return TRUE;
+    }
+    return FALSE;
 }

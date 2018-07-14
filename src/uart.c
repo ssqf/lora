@@ -120,8 +120,6 @@ void SendDevice(uint8_t *data, uint8_t dataLen)
     uint8_t remainLen = dataLen;
     while (0 != remainLen)
     {
-        //while (IsDevSend); //等待发送结束
-
         len = DEV_SEND_BUFF_SIZE <= remainLen ? DEV_SEND_BUFF_SIZE : remainLen;
         memcpy(DEV_SEND_BUFF, data + pos, len);
         DMA_Cmd(DEV_DMA_TX, DISABLE);
@@ -165,8 +163,9 @@ void SetRS485CTL(BitAction state)
 
 void SetLoraReadySend()
 {
-    SetMWakeState(RESET);
-    Delay5ms();
+    //SetHostWakeState(SET);
+    //Delay5ms();
+    DelaySendTask(5, LORA_DATA_SEND);
 }
 
 void initUart3()

@@ -11,6 +11,8 @@ typedef enum
     LORA_SEND_COMPLETE,
     DEV_SEND_COMPLETE,
     LORA_DATA_SEND,
+    START_DELAY_TASK,
+    ENTER_LORA_AT_MODEL
 
 } TaskType;
 

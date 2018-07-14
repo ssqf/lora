@@ -325,7 +325,18 @@ INTERRUPT_HANDLER(TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler, 19)
   {
     TIM2_ClearITPendingBit(TIM2_IT_Update);
     TIM2_Cmd(DISABLE);
-    PushTask(LORA_DATA_SEND);
+
+    DelayTask *t = GetCurrTask();
+    if (NULL != t)
+    {
+      PushTask(t->t);
+      t->used = FALSE;
+    }
+    DelayTask *minTask = GetMinTask();
+    if (NULL != minTask)
+    {
+      StartNextDelyaTask(minTask->delay);
+    }
   }
 }
 

@@ -42,33 +42,94 @@ void InitDelayTimer()
     //TIM1_Cmd(ENABLE);
 }
 
-typedef struct
-{
-
-    uint16_t delay;
-    TaskType t;
-} DelayTask;
-
 #define delayTaskSize 10
+#define invalidCurrIndex -1 //-1无任务
 DelayTask delayTaskList[delayTaskSize];
-uint16_t CurrentMs = 0;
-uint8_t delayHead = 0;
-uint8_t dalayTail = 0;
+int curTaskIndex = invalidCurrIndex;
+
 bool DelaySendTask(uint16_t ms, TaskType t)
 {
-    delayTaskList[dalayTail].delay = ms + CurrentMs;
-    delayTaskList[dalayTail].t = t;
+    for (uint8_t i = 0; i < delayTaskSize; i++)
+    {
+        if (!delayTaskList[i].used)
+        {
+            delayTaskList[i].t = t;
+            delayTaskList[i].used = TRUE;
+
+            if (!(TIM2->CR1 & TIM_CR1_CEN))
+            {
+                delayTaskList[i].delay = ms;
+                PushTask(START_DELAY_TASK);
+            }
+            else
+            {
+                delayTaskList[i].delay = ms - TIM2_GetCounter();
+            }
+
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+DelayTask *GetMinTask()
+{
+    DelayTask *minTask = NULL;
+    //curTaskIndex = invalidCurrIndex;
+    for (uint8_t i = 0; i < delayTaskSize; i++)
+    {
+        if (delayTaskList[i].used)
+        {
+            if (NULL == minTask)
+            {
+                minTask = &delayTaskList[i];
+                curTaskIndex = i;
+            }
+            else if (minTask->delay > delayTaskList[i].delay)
+            {
+                minTask = &delayTaskList[i];
+                curTaskIndex = i;
+            }
+        }
+    }
+
+    if (NULL == minTask)
+    {
+        curTaskIndex = invalidCurrIndex;
+    }
+
+    return minTask;
+}
+
+DelayTask *GetCurrTask()
+{
+    if (invalidCurrIndex == curTaskIndex)
+    {
+        return NULL;
+    }
+    return &delayTaskList[curTaskIndex];
 }
 
 //TODO:延迟任务队列实现
 
-void Delay5ms() //5ms终端发送lora数据
+void StartDelayTask() //5ms终端发送lora数据
 {
-    TIM2_TimeBaseInit(TIM2_Prescaler_16, TIM2_CounterMode_Down, 5000); //1M 1000 1ms
+    DelayTask *task = GetMinTask();
+    if (!task->used)
+    {
+        return;
+    }
+    StartNextDelyaTask(task->delay);
+}
+
+void StartNextDelyaTask(uint16_t time)
+{
+    TIM2_TimeBaseInit(TIM2_Prescaler_16, TIM2_CounterMode_Down, time); //1M 1000 1ms
     //TIM2_SetAutoreload(1000);
     TIM2_ARRPreloadConfig(DISABLE);
     ITC_SetSoftwarePriority(TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQn, ITC_PriorityLevel_3);
     CLK_PeripheralClockConfig(CLK_Peripheral_TIM2, ENABLE);
+    TIM2_ClearITPendingBit(TIM2_IT_Update);
     TIM2_ITConfig(TIM2_IT_Update, ENABLE);
     TIM2_Cmd(ENABLE);
 }
