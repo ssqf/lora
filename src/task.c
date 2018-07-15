@@ -2,7 +2,7 @@
 
 #include "lora.h"
 
-#define LISTSIZE 20
+#define LISTSIZE 50
 int8_t head = 0;
 int8_t tail = 0;
 int8_t listLen = 0;
@@ -61,7 +61,7 @@ bool IsEmptyTaskList()
 void HandleTask()
 {
     TaskType task;
-    char str[50] = "second=0000,tick=00\n";
+    //char str[50] = "second=0000,tick=00\r\n";
     while (1)
     {
         while (IsEmptyTaskList()) //队列不为空
@@ -70,7 +70,7 @@ void HandleTask()
         switch (task)
         {
         case TICK:
-            // if (TickNum == 1 && Second % 5 == 0)
+            // if (TickNum == 1 && Second % 10 == 0)
             // {
             //     str[7] = '0' + Second / 1000 % 10;
             //     str[8] = '0' + Second / 100 % 10;
@@ -83,7 +83,15 @@ void HandleTask()
             break;
 
         case LORA_RECV_DATA:
-            HandleLoraData();
+            if (AT_Status == LORA_TRANSFER)
+            {
+                HandleLoraData();
+            }
+            else
+            {
+                HandLoraATModel();
+            }
+
             //SendDevice("LORA_RECV_DATA\n", 16);
             break;
         case DEV_RECV_DATA:
@@ -96,18 +104,28 @@ void HandleTask()
             SetRS485CTL(RESET);
             break;
         case LORA_SEND_COMPLETE:
-            while (USART_GetFlagStatus(LoraCom, USART_FLAG_TC) != SET) //DMA 完成不等于串口发送完成，要等待串口发送完成，不然丢数据
-                ;
+            //while (USART_GetFlagStatus(LoraCom, USART_FLAG_TC) != SET); //DMA 完成不等于串口发送完成，要等待串口发送完成，不然丢数据
             //SetHostWakeState(RESET);
             break;
         case LORA_DATA_SEND:
+            SetWakeState(SET);
             HandSendLoarData();
             break;
         case START_DELAY_TASK:
             StartDelayTask();
             break;
-        case ENTER_LORA_AT_MODEL:
-            ATCMD_EnterLoraConfMode();
+        case ATCMD_RESTARTEND:
+            ATCMD_ResartEnd();
+            break;
+        case ENTER_ATMODLE_TIMEOUT:
+            EnterAtModelTimeout();
+            break;
+        case EXIT_AT_TIMEOUT:
+            if (AT_Status == LORA_READY_EXIT_ATCMD)
+            {
+                SendLora("AT+ENTM\r\n", 9);
+            }
+
             break;
         }
     }

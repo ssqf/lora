@@ -7,14 +7,14 @@ static uint8_t Lorabuff[BUFF_SIZE];
 static uint8_t Devbuff[BUFF_SIZE];
 static uint8_t DevDataStartPos = 0;
 static uint8_t DevDataEndPos = 0;
-static uint8_t DevDataLen = 0;
+//static uint8_t DevDataLen = 0;
 static uint8_t DevRemainDataLen = BUFF_SIZE;
 static uint8_t LoraDataStartPos = 0;
 static uint8_t LoraDataEndPos = 0;
-static uint8_t LoraDataLen = 0;
+//static uint8_t LoraDataLen = 0;
 static uint8_t LoraRemainDataLen = BUFF_SIZE;
-
-static bool isEnterLoraConfig(uint8_t *data, uint8_t len);
+uint8_t LoraData[BUFF_SIZE];
+uint8_t DevData[BUFF_SIZE];
 
 uint8_t GetBuffRemainLen()
 {
@@ -65,82 +65,168 @@ bool PushDataDevBuff(uint8_t *data, uint8_t len)
     return TRUE;
 }
 
-void HandleLoraDate()
+void ClearDevBuff(uint8_t len)
 {
+    if (len == 0)
+    {
+        DevDataStartPos = 0;
+        DevDataEndPos = 0;
+        DevRemainDataLen = BUFF_SIZE;
+    }
+    else
+    {
+        if (BUFF_SIZE - DevDataStartPos < len)
+        {
+            DevDataStartPos = len - (BUFF_SIZE - DevDataStartPos);
+        }
+        else
+        {
+            DevDataStartPos += len;
+        }
+
+        DevRemainDataLen += len;
+    }
 }
 
-uint8_t SendLoraData[BUFF_SIZE];
-uint8_t SendLoraDataLen = 0;
-void HandleDevData()
+void ClearLoraBuff(uint8_t len)
+{
+    if (len == 0)
+    {
+        LoraDataStartPos = 0;
+        LoraDataEndPos = 0;
+        LoraRemainDataLen = BUFF_SIZE;
+    }
+    else
+    {
+        if (BUFF_SIZE - LoraDataStartPos < len)
+        {
+            LoraDataStartPos = len - (BUFF_SIZE - LoraDataStartPos);
+        }
+        else
+        {
+            LoraDataStartPos += len;
+        }
+
+        LoraRemainDataLen += len;
+    }
+}
+
+uint8_t *GetDevDataFromBuff(uint8_t *desiredLen, bool isDel)
 {
     uint8_t i = 0;
     uint8_t j = 0;
     uint8_t k = 0;
-    uint8_t len = BUFF_SIZE - DevRemainDataLen;
+    uint8_t totalLen = BUFF_SIZE - DevRemainDataLen;
+    uint8_t len = 0;
+    if (*desiredLen == 0) //desiredLen为空获取所有数据
+    {
+        len = totalLen;
+    }
+    else
+    {
+        len = totalLen <= *desiredLen ? totalLen : *desiredLen;
+    }
     for (i = 0, j = 0, k = DevDataStartPos; i < len; i++)
     {
         if (k >= BUFF_SIZE)
         {
             k = 0;
         }
-        SendLoraData[j++] = Devbuff[k++];
+        DevData[j++] = Devbuff[k++];
     }
-    DevDataStartPos = k;
-    DevRemainDataLen += i;
-    SendLoraDataLen = i;
-    if (isEnterLoraConfig(SendLoraData, SendLoraDataLen))
+    if (isDel)
     {
-        EnterLoraConfMode();
+        DevDataStartPos = k;
+        DevRemainDataLen += i;
     }
-    //SendLora(SendLoraData, SendLoraDataLen);
-    SetLoraReadySend();
+
+    *desiredLen = i;
+    return DevData;
 }
 
-uint8_t SendDevData[BUFF_SIZE];
-uint8_t SendDevDataLen = 0;
-
-void HandleLoraData()
+//isDel边上获取后是否从buff中删除
+uint8_t *GetLoraDataFromBuff(uint8_t *desiredLen, bool isDel)
 {
     uint8_t i = 0;
     uint8_t j = 0;
     uint8_t k = 0;
-    uint8_t len = BUFF_SIZE - LoraRemainDataLen;
-
+    uint8_t totalLen = BUFF_SIZE - LoraRemainDataLen;
+    uint8_t len = 0;
+    if (*desiredLen == 0) //desiredLen为空获取所有数据
+    {
+        len = totalLen;
+    }
+    else
+    {
+        len = totalLen <= *desiredLen ? totalLen : *desiredLen;
+    }
     for (i = 0, j = 0, k = LoraDataStartPos; i < len; i++)
     {
         if (k >= BUFF_SIZE)
         {
             k = 0;
         }
-        SendDevData[j++] = Lorabuff[k++];
+        LoraData[j++] = Lorabuff[k++];
     }
-    LoraDataStartPos = k;
-    LoraRemainDataLen += i;
-    SendDevDataLen = i;
+    if (isDel)
+    {
+        LoraDataStartPos = k;
+        LoraRemainDataLen += i;
+    }
+    *desiredLen = i;
+    return LoraData;
+}
 
-    SendDevice(SendDevData, SendDevDataLen);
-    SendDevDataLen = 0;
+void HandleDevData()
+{
+    uint8_t desiredLen;
+    desiredLen = 0;
+    uint8_t *data = GetDevDataFromBuff(&desiredLen, FALSE);
+    if ((AT_Status == LORA_TRANSFER) && IsEnterLoraConfig(data, desiredLen)) //判断是不是+++ 要进入AT模式
+    {
+        ClearDevBuff(desiredLen);
+        ATCMD_RestartBegin();
+        DelaySendTask(3000, ENTER_ATMODLE_TIMEOUT); //3s没有进AT模式则超时
+        AT_Status = LORA_RESTART;
+        Debug("RestartBegin LORA_RESTART");
+    }
+
+    if (AT_Status == LORA_IN_ATCMD)
+    {
+        if (IsRedayExitATCmd(data, desiredLen)) //判断是不是"AT+ENTM\r\n" 要退出AT模式
+        {
+            AT_Status = LORA_READY_EXIT_ATCMD;
+            //SetLoraReadySend();
+            DelaySendTask(10, EXIT_AT_TIMEOUT);
+            HandSendLoarData();
+            Debug("LORA_READY_EXIT_ATCMD");
+        }
+    }
+
+    //SendLora(SendLoraData, SendLoraDataLen);
+    if ((AT_Status == LORA_TRANSFER) || (AT_Status == LORA_IN_ATCMD))
+    {
+        //SetLoraReadySend();
+        HandSendLoarData();
+    }
+}
+
+void HandleLoraData()
+{
+    uint8_t desiredLen;
+    desiredLen = 0;
+    uint8_t *data = GetLoraDataFromBuff(&desiredLen, TRUE);
+    SendDevice(data, desiredLen);
 }
 
 void HandSendLoarData()
 {
-    if (0 == SendLoraDataLen)
+    uint8_t desiredLen;
+    desiredLen = 0;
+    uint8_t *data = GetDevDataFromBuff(&desiredLen, TRUE);
+    if (0 == desiredLen)
     {
         return;
     }
-    SendLora(SendLoraData, SendLoraDataLen);
-    SendLoraDataLen = 0;
-}
-
-static bool isEnterLoraConfig(uint8_t *data, uint8_t len)
-{
-    if (len < 3)
-    {
-        return FALSE;
-    }
-    if (strncmp(data, "+++", 3) == 0)
-    {
-        return TRUE;
-    }
-    return FALSE;
+    SendLora(data, desiredLen);
 }

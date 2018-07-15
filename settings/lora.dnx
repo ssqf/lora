@@ -16,14 +16,14 @@
         <ShowSource>1</ShowSource>
     </Trace1>
     <DebugChecksum>
-        <Checksum>4075714326</Checksum>
+        <Checksum>321794562</Checksum>
     </DebugChecksum>
     <CodeCoverage>
         <Enabled>_ 0</Enabled>
     </CodeCoverage>
     <Disassembly>
         <InstrCount>0</InstrCount>
-        <MixedMode>1</MixedMode>
+        <MixedMode>0</MixedMode>
     </Disassembly>
     <CallStack>
         <ShowArgs>0</ShowArgs>
@@ -92,13 +92,7 @@
     </DataSample>
     <Breakpoints>
         <Bp0>_ "STD_DATA" "InitDevice" 1 0 0 3 0 "" 0 ""</Bp0>
-        <Bp1>_ "STD_CODE" "{$PROJ_DIR$\src\task.c}.86.13" 1 0 0 0 "" 0 ""</Bp1>
-        <Bp2>_ "STD_CODE" "{$PROJ_DIR$\src\task.c}.90.13" 1 0 0 0 "" 0 ""</Bp2>
-        <Bp3>_ "STD_CODE" "{$PROJ_DIR$\src\task.c}.107.13" 1 0 0 0 "" 0 ""</Bp3>
-        <Bp4>_ "STD_CODE" "{$PROJ_DIR$\src\task.c}.104.13" 1 0 0 0 "" 0 ""</Bp4>
-        <Bp5>_ "STD_CODE" "{$PROJ_DIR$\src\task.c}.110.13" 1 0 0 0 "" 0 ""</Bp5>
-        <Bp6>_ "STD_CODE" "{$PROJ_DIR$\src\stm8l15x_it.c}.324.3" 1 0 0 0 "" 0 ""</Bp6>
-        <Count>7</Count>
+        <Count>1</Count>
     </Breakpoints>
     <LogFile>
         <LoggingEnabled>_ 0</LoggingEnabled>

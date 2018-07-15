@@ -1,5 +1,6 @@
 #include "lora.h"
 
+ATCmd_Status AT_Status = LORA_TRANSFER;
 void SetLoraSerial()
 {
 }
@@ -16,7 +17,7 @@ void SetLoraChan(uint8_t chan)
 {
 }
 
-void initLora()
+void InitLoraPin()
 {
     GPIO_Init(GPIOB, GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3, GPIO_Mode_Out_PP_High_Fast); //Host_WAKE，M_WAKE，M_Reload,M_RST,
     GPIO_Init(GPIOD, GPIO_Pin_0, GPIO_Mode_Out_PP_High_Fast);                                        //CTRL_REDAY
@@ -45,15 +46,170 @@ void SetResetState(BitAction state)
     GPIO_WriteBit(GPIOB, GPIO_Pin_3, state);
 }
 
-void EnterLoraConfMode()
+void ATCMD_RestartBegin()
 {
     SetResetState(RESET);
-    DelaySendTask(10, ENTER_LORA_AT_MODEL); //拉低10ms Lora复位
+    DelaySendTask(10, ATCMD_RESTARTEND); //拉低10ms Lora复位
 }
 
-void ATCMD_EnterLoraConfMode()
+void ATCMD_ResartEnd()
 {
     SetResetState(SET);
-    SendLora("+++", 3);
-    SendLora("a", 1);
+}
+
+// void SendEnterConfigAtcmd()
+// {
+//     SendLora("+++", 3);
+// }
+
+//进AT命令模式步骤
+//1、复位LoRa模组
+//2、复位后2秒内给LoRa发送+++
+//3、收到LoRa返回的a，再给LoRa发送a
+//4、收到LoRa返回的+OK表示进入AT 命令模式
+bool IsEnterLoraConfig(uint8_t *data, uint8_t len)
+{
+    if (len < 3)
+    {
+        return FALSE;
+    }
+    if (strstr((char const *)data, "+++") != NULL)
+    {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+bool IsLoraStart(uint8_t *data, uint8_t len)
+{
+    char *str = "LoRa Start!\r\n";
+    if (len < strlen(str))
+    {
+        return FALSE;
+    }
+    if (strstr((char const *)data, str) != NULL)
+    {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+bool IsEnterATCmdResp(uint8_t *data, uint8_t len)
+{
+    if (len < 1)
+    {
+        return FALSE;
+    }
+    if (strstr((char const *)data, "a") != NULL)
+    {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+bool IsEnterATCmdOK(uint8_t *data, uint8_t len)
+{
+    if (len < 3)
+    {
+        return FALSE;
+    }
+    if (strstr((char const *)data, "+OK") != NULL)
+    {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+bool IsRedayExitATCmd(uint8_t *data, uint8_t len)
+{
+    if (len < 9)
+    {
+        return FALSE;
+    }
+    if (strstr((char const *)data, "AT+ENTM\r\n") != NULL)
+    {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+bool IsExitATCmdOK(uint8_t *data, uint8_t len)
+{
+    if (len < 8)
+    {
+        return FALSE;
+    }
+    if (strstr((char const *)data, "\r\n\r\nOK\r\n") != NULL)
+    {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+void EnterAtModelTimeout()
+{
+    if (AT_Status != LORA_IN_ATCMD)
+    {
+        AT_Status = LORA_TRANSFER;
+        ClearDevBuff(0);
+    }
+}
+
+bool IsExitAtErr(uint8_t *data, uint8_t len)
+{
+    if (len < 3)
+    {
+        return FALSE;
+    }
+    if (strstr((char const *)data, "ERR") != NULL)
+    {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+void HandLoraATModel()
+{
+    uint8_t desiredLen;
+    desiredLen = 0;
+    uint8_t *data = GetLoraDataFromBuff(&desiredLen, FALSE);
+    if (IsLoraStart(data, desiredLen) && (AT_Status == LORA_RESTART))
+    {
+        AT_Status = LORA_RESTART_OK;
+        SendLora("+++", 3);
+        HandleLoraData();
+        Debug("SendLora(+++)");
+    }
+    else if (IsEnterATCmdResp(data, desiredLen) && (AT_Status == LORA_RESTART_OK))
+    {
+        AT_Status = LORA_READY_ENTER;
+        //DelayUs(1000000);
+        SendLora("a", 1);
+        HandleLoraData();
+        Debug("SendLora(a)");
+    }
+    else if (IsEnterATCmdOK(data, desiredLen) && (AT_Status == LORA_READY_ENTER))
+    {
+        AT_Status = LORA_IN_ATCMD;
+        HandleLoraData();
+        Debug("LORA_IN_ATCMD");
+    }
+    else if (IsExitATCmdOK(data, desiredLen) && (AT_Status == LORA_READY_EXIT_ATCMD))
+    {
+        AT_Status = LORA_EXIT_ATCMD;
+        AT_Status = LORA_TRANSFER;
+        HandleLoraData();
+        Debug("ExitAt OK");
+    }
+    else if (AT_Status == LORA_READY_EXIT_ATCMD && IsExitAtErr(data, desiredLen))
+    {
+        SendLora("AT+ENTM\r\n", 9);
+        Debug("ExitAt Error");
+    }
+    else
+    {
+        HandleLoraData(); //特殊处理完再处理发给串口
+    }
+
+    //HandleLoraData(); //特殊处理完再处理发给串口
 }

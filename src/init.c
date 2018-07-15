@@ -8,6 +8,7 @@ void InitDevice()
     InitClock();
     InitTask();
     enableInterrupts();
+    InitLoraPin();
 }
 
 void initCLK()
@@ -38,4 +39,11 @@ void initMapPort()
 {
     SYSCFG_REMAPDeInit();
     //SYSCFG_REMAPPinConfig();
+}
+
+void DelayUs(uint32_t delay)
+{
+    uint32_t d = delay * 16;
+    for (; d; d--)
+        ;
 }

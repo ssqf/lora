@@ -324,19 +324,15 @@ INTERRUPT_HANDLER(TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler, 19)
   if (TIM2_GetITStatus(TIM2_IT_Update) == SET)
   {
     TIM2_ClearITPendingBit(TIM2_IT_Update);
-    TIM2_Cmd(DISABLE);
-
-    DelayTask *t = GetCurrTask();
-    if (NULL != t)
+    TickNum++;
+    if (TickNum >= 50)
     {
-      PushTask(t->t);
-      t->used = FALSE;
+      TickNum = 0;
+      Second++;
     }
-    DelayTask *minTask = GetMinTask();
-    if (NULL != minTask)
-    {
-      StartNextDelyaTask(minTask->delay);
-    }
+    TaskType t = TICK;
+    PushTask(t);
+    //TIM2_ClearFlag(TIM2_FLAG_Update);
   }
 }
 
@@ -393,18 +389,34 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_COM_IRQHandler, 23)
      it is recommended to set a breakpoint on the following instruction.
   */
 
-  if (TIM1_GetFlagStatus(TIM1_FLAG_Update))
+  if (TIM1_GetITStatus(TIM1_IT_Update) == SET)
   {
     TIM1_ClearITPendingBit(TIM1_IT_Update);
-    TickNum++;
-    if (TickNum >= 50)
+    TIM1_ClearFlag(TIM1_FLAG_Update);
+    TIM1_Cmd(DISABLE);
+
+    DelayTask *t = GetCurrTask();
+    if (NULL != t)
     {
-      TickNum = 0;
-      Second++;
+      PushTask(t->t);
+      t->used = FALSE;
+      Debug("Timer1 Push:%d", t->t);
     }
-    TaskType t = TICK;
-    PushTask(t);
-    //TIM1_ClearFlag(TIM1_FLAG_Update);
+    else
+    {
+      Debug("Timer1 Push NULL");
+    }
+    DelayTask *minTask = GetMinTask();
+    if (NULL != minTask)
+    {
+
+      StartNextDelyaTask(minTask->delay);
+      Debug("Next delay %d task:%d", minTask->delay, minTask->t);
+    }
+    else
+    {
+      Debug("Next task is NULL");
+    }
   }
 }
 /**

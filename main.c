@@ -7,5 +7,4 @@ int main(void)
   {
     HandleTask();
   }
-  return 0;
 }

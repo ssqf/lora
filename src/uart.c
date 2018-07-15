@@ -2,11 +2,6 @@
 
 #include "uart.h"
 
-// uint8_t LoraRxBuff[100] = {0};
-// uint8_t LoraTxBuff[100] = {0};
-// uint8_t DevRxBuff[100] = {0};
-// uint8_t DevTxBuff[100] = {0};
-
 const uint32_t LoraBaudRate = 115200; //lora WH-L101 默认值 波特率 115200、无校验、8 位数据位、1 位停止位
 const uint32_t DevBaudRate = 9600;
 
@@ -29,7 +24,7 @@ void InitUart()
     initRS458CTL();
     initDeviceUart();
     initLoraUart();
-    //initUart3();
+    initUart3();
     initDMA();
     USART_Cmd(DevCom, ENABLE);
     USART_Cmd(LoraCom, ENABLE);
@@ -46,21 +41,16 @@ static void initDMA()
     DMA_Init(LORA_DMA_RX, LORA_RX_BUFF_ADDR, LORA_DR_ADDR, LORA_RECV_BUFF_SIZE, /* DMA_BufferSize */
              DMA_DIR_PeripheralToMemory, DMA_Mode_Normal, DMA_MemoryIncMode_Inc,
              DMA_Priority_High, DMA_MemoryDataSize_Byte);
-    DMA_Init(LORA_DMA_TX, LORA_TX_BUFF_ADDR, LORA_DR_ADDR, LORA_SEND_BUFF_SIZE, /* DMA_BufferSize */
+    DMA_Init(LORA_DMA_TX, LORA_TX_BUFF_ADDR, LORA_DR_ADDR, 0, /* DMA_BufferSize */
              DMA_DIR_MemoryToPeripheral, DMA_Mode_Normal, DMA_MemoryIncMode_Inc,
              DMA_Priority_High, DMA_MemoryDataSize_Byte);
 
     DMA_Init(DEV_DMA_RX, DEV_RX_BUFF_ADDR, DEV_DR_ADDR, DEV_RECV_BUFF_SIZE, /* DMA_BufferSize */
              DMA_DIR_PeripheralToMemory, DMA_Mode_Normal, DMA_MemoryIncMode_Inc,
              DMA_Priority_Low, DMA_MemoryDataSize_Byte);
-    DMA_Init(DEV_DMA_TX, DEV_TX_BUFF_ADDR, DEV_DR_ADDR, DEV_SEND_BUFF_SIZE, /* DMA_BufferSize */
+    DMA_Init(DEV_DMA_TX, DEV_TX_BUFF_ADDR, DEV_DR_ADDR, 0, /* DMA_BufferSize */
              DMA_DIR_MemoryToPeripheral, DMA_Mode_Normal, DMA_MemoryIncMode_Inc,
              DMA_Priority_Low, DMA_MemoryDataSize_Byte);
-
-    USART_DMACmd(DevCom, USART_DMAReq_TX, ENABLE);
-    USART_DMACmd(DevCom, USART_DMAReq_RX, ENABLE);
-    USART_DMACmd(LoraCom, USART_DMAReq_TX, ENABLE);
-    USART_DMACmd(LoraCom, USART_DMAReq_RX, ENABLE);
 
     DMA_ITConfig(LORA_DMA_RX, DMA_ITx_TC, ENABLE);
     DMA_ITConfig(LORA_DMA_TX, DMA_ITx_TC, ENABLE);
@@ -74,8 +64,10 @@ static void initDMA()
 
     DMA_GlobalCmd(ENABLE);
 
-    USART_DMACmd(LoraCom, USART_DMAReq_RX, ENABLE);
+    USART_DMACmd(DevCom, USART_DMAReq_TX, ENABLE);
     USART_DMACmd(DevCom, USART_DMAReq_RX, ENABLE);
+    USART_DMACmd(LoraCom, USART_DMAReq_TX, ENABLE);
+    USART_DMACmd(LoraCom, USART_DMAReq_RX, ENABLE);
 }
 
 static void initDeviceUart()
@@ -163,7 +155,7 @@ void SetRS485CTL(BitAction state)
 
 void SetLoraReadySend()
 {
-    //SetHostWakeState(SET);
+    SetWakeState(RESET);
     //Delay5ms();
     DelaySendTask(5, LORA_DATA_SEND);
 }
@@ -177,11 +169,10 @@ void initUart3()
     /* Configure USART Rx as alternate function push-pull  (software pull up)*/
     GPIO_ExternalPullUpConfig(GPIOF, GPIO_Pin_1, ENABLE);
 
-    USART_ClockInit(USART3, USART_Clock_Enable, USART_CPOL_Low, USART_CPHA_1Edge, USART_LastBit_Disable);
-    USART_SetPrescaler(USART3, 1);
+    //USART_SetPrescaler(USART3, 1);
 
-    USART_Init(DevCom, 9600, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Rx | USART_Mode_Tx);
-    //USART_ITConfig(USART3, USART_IT_IDLE, ENABLE);
+    USART_Init(USART3, 115200, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Rx | USART_Mode_Tx);
+    //USART_ITConfig(USART3, , ENABLE);
     USART_Cmd(USART3, ENABLE);
 }
 
@@ -230,7 +221,7 @@ int getchar(void)
     return (c);
 }
 
-void showString(char *str)
+void ShowString(char *str)
 {
     while ('\0' != *str)
     {

@@ -21,10 +21,10 @@ typedef enum
 #define LORA_SEND_BUFF_SIZE 50
 #define DEV_RECV_BUFF_SIZE 50
 #define DEV_SEND_BUFF_SIZE 50
-#define DEV_DMA_FLAG_TCRX (uint16_t) DMA1_FLAG_TC3
-#define DEV_DMA_FLAG_TCTX (uint16_t) DMA1_FLAG_TC0
-#define LORA_DMA_FLAG_TCRX (uint16_t) DMA1_FLAG_TC2
-#define LORA_DMA_FLAG_TCTX (uint16_t) DMA1_FLAG_TC1
+#define DEV_DMA_FLAG_TCRX DMA1_FLAG_TC3
+#define DEV_DMA_FLAG_TCTX DMA1_FLAG_TC0
+#define LORA_DMA_FLAG_TCRX DMA1_FLAG_TC2
+#define LORA_DMA_FLAG_TCTX DMA1_FLAG_TC1
 
 extern uint8_t LORA_RECV_BUFF[LORA_RECV_BUFF_SIZE];
 extern uint8_t LORA_SEND_BUFF[LORA_SEND_BUFF_SIZE];
@@ -44,7 +44,7 @@ extern void SendDevice(uint8_t *data, uint8_t dataLen);
 extern void SetRS485CTL(BitAction state);
 extern int putchar(int c);
 extern int getchar(void);
-extern void showString(char *str);
+extern void ShowString(char *str);
 extern void InitUart();
 extern void ResetDevRx();
 extern void ResetLoraRx();

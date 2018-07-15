@@ -2221,9 +2221,6 @@
             <file>
                 <name>$PROJ_DIR$\libs\inc\stm8l15x_wwdg.h</name>
             </file>
-            <file>
-                <name>$PROJ_DIR$\libs\inc\timing_delay.h</name>
-            </file>
         </group>
         <group>
             <name>src</name>
@@ -2310,9 +2307,6 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\libs\src\stm8l15x_wwdg.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\src\timing_delay.c</name>
             </file>
         </group>
     </group>
