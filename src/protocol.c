@@ -2,7 +2,7 @@
 //需要数据：1、sn；2、包序列号；3、ack确认；
 #include "protocol.h"
 
-#define BUFF_SIZE 100
+#define BUFF_SIZE 200
 static uint8_t Lorabuff[BUFF_SIZE];
 static uint8_t Devbuff[BUFF_SIZE];
 static uint8_t DevDataStartPos = 0;
@@ -141,6 +141,7 @@ uint8_t *GetDevDataFromBuff(uint8_t *desiredLen, bool isDel)
     }
 
     *desiredLen = i;
+    Debug("GetDevDataFromBuff totalLen:%d,desiredLen:%d", totalLen, i);
     return DevData;
 }
 
@@ -174,6 +175,7 @@ uint8_t *GetLoraDataFromBuff(uint8_t *desiredLen, bool isDel)
         LoraRemainDataLen += i;
     }
     *desiredLen = i;
+    Debug("GetLoraDataFromBuff totalLen:%d,desiredLen:%d", totalLen, i);
     return LoraData;
 }
 
@@ -229,4 +231,12 @@ void HandSendLoarData()
         return;
     }
     SendLora(data, desiredLen);
+    Debug("HandSendLoarData desiredLen:%d", desiredLen);
 }
+
+
+
+/*
+协议说明
+
+*/

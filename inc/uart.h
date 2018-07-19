@@ -17,9 +17,9 @@ typedef enum
 #define LORA_DMA_TX DMA1_Channel1
 #define DEV_DMA_RX DMA1_Channel3
 #define DEV_DMA_TX DMA1_Channel0
-#define LORA_RECV_BUFF_SIZE 50
+#define LORA_RECV_BUFF_SIZE 100
 #define LORA_SEND_BUFF_SIZE 50
-#define DEV_RECV_BUFF_SIZE 50
+#define DEV_RECV_BUFF_SIZE 100
 #define DEV_SEND_BUFF_SIZE 50
 #define DEV_DMA_FLAG_TCRX DMA1_FLAG_TC3
 #define DEV_DMA_FLAG_TCTX DMA1_FLAG_TC0
@@ -29,7 +29,9 @@ typedef enum
 extern uint8_t LORA_RECV_BUFF[LORA_RECV_BUFF_SIZE];
 extern uint8_t LORA_SEND_BUFF[LORA_SEND_BUFF_SIZE];
 extern uint8_t DEV_RECV_BUFF[DEV_RECV_BUFF_SIZE];
-extern uint8_t DEV_SEND_BUFF[DEV_RECV_BUFF_SIZE];
+extern uint8_t DEV_SEND_BUFF[DEV_SEND_BUFF_SIZE];
+extern uint8_t LoraRecvPos;
+extern uint8_t DevRecvPos;
 
 #define LORA_RX_BUFF_ADDR (uint32_t)(&LORA_RECV_BUFF)
 #define LORA_TX_BUFF_ADDR (uint32_t)(&LORA_SEND_BUFF)

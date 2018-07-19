@@ -18,13 +18,19 @@ uint8_t LORA_RECV_BUFF[LORA_RECV_BUFF_SIZE];
 uint8_t LORA_SEND_BUFF[LORA_SEND_BUFF_SIZE];
 uint8_t DEV_RECV_BUFF[DEV_RECV_BUFF_SIZE];
 uint8_t DEV_SEND_BUFF[DEV_SEND_BUFF_SIZE];
+uint8_t LoraRecvPos = 0;
+uint8_t DevRecvPos = 0;
 
 void InitUart()
 {
     initRS458CTL();
     initDeviceUart();
     initLoraUart();
+
+#ifdef __DEBUG__
     initUart3();
+#endif
+
     initDMA();
     USART_Cmd(DevCom, ENABLE);
     USART_Cmd(LoraCom, ENABLE);
@@ -38,23 +44,24 @@ static void initDMA()
     DMA_DeInit(DEV_DMA_RX);
     DMA_DeInit(DEV_DMA_TX);
 
+    //DMA要模式设置为Normal则传一次就结束，要重传要重新buff的地址和接收的数据
     DMA_Init(LORA_DMA_RX, LORA_RX_BUFF_ADDR, LORA_DR_ADDR, LORA_RECV_BUFF_SIZE, /* DMA_BufferSize */
-             DMA_DIR_PeripheralToMemory, DMA_Mode_Normal, DMA_MemoryIncMode_Inc,
+             DMA_DIR_PeripheralToMemory, DMA_Mode_Circular, DMA_MemoryIncMode_Inc,
              DMA_Priority_High, DMA_MemoryDataSize_Byte);
     DMA_Init(LORA_DMA_TX, LORA_TX_BUFF_ADDR, LORA_DR_ADDR, 0, /* DMA_BufferSize */
              DMA_DIR_MemoryToPeripheral, DMA_Mode_Normal, DMA_MemoryIncMode_Inc,
              DMA_Priority_High, DMA_MemoryDataSize_Byte);
 
     DMA_Init(DEV_DMA_RX, DEV_RX_BUFF_ADDR, DEV_DR_ADDR, DEV_RECV_BUFF_SIZE, /* DMA_BufferSize */
-             DMA_DIR_PeripheralToMemory, DMA_Mode_Normal, DMA_MemoryIncMode_Inc,
+             DMA_DIR_PeripheralToMemory, DMA_Mode_Circular, DMA_MemoryIncMode_Inc,
              DMA_Priority_Low, DMA_MemoryDataSize_Byte);
     DMA_Init(DEV_DMA_TX, DEV_TX_BUFF_ADDR, DEV_DR_ADDR, 0, /* DMA_BufferSize */
              DMA_DIR_MemoryToPeripheral, DMA_Mode_Normal, DMA_MemoryIncMode_Inc,
              DMA_Priority_Low, DMA_MemoryDataSize_Byte);
 
-    DMA_ITConfig(LORA_DMA_RX, DMA_ITx_TC, ENABLE);
+    DMA_ITConfig(LORA_DMA_RX, DMA_ITx_TC | DMA_ITx_HT, ENABLE);
     DMA_ITConfig(LORA_DMA_TX, DMA_ITx_TC, ENABLE);
-    DMA_ITConfig(DEV_DMA_RX, DMA_ITx_TC, ENABLE);
+    DMA_ITConfig(DEV_DMA_RX, DMA_ITx_TC | DMA_ITx_HT, ENABLE);
     DMA_ITConfig(DEV_DMA_TX, DMA_ITx_TC, ENABLE);
 
     DMA_Cmd(LORA_DMA_RX, ENABLE);
@@ -112,6 +119,9 @@ void SendDevice(uint8_t *data, uint8_t dataLen)
     uint8_t remainLen = dataLen;
     while (0 != remainLen)
     {
+        while (USART_GetFlagStatus(DevCom, USART_FLAG_TC) != SET) //DMA 完成不等于串口发送完成，要等待串口发送完成，不然丢数据
+            ;
+
         len = DEV_SEND_BUFF_SIZE <= remainLen ? DEV_SEND_BUFF_SIZE : remainLen;
         memcpy(DEV_SEND_BUFF, data + pos, len);
         DMA_Cmd(DEV_DMA_TX, DISABLE);
@@ -119,8 +129,10 @@ void SendDevice(uint8_t *data, uint8_t dataLen)
         DMA_Cmd(DEV_DMA_TX, ENABLE);
         SetRS485CTL(SET);
         //USART_DMACmd(DevCom, USART_DMAReq_TX, ENABLE);
+        Debug("SendDevice len:%d", len);
         pos = pos + len;
         remainLen = remainLen - len;
+        IsDevSend = TRUE;
     }
 }
 
@@ -131,14 +143,21 @@ void SendLora(uint8_t *data, uint8_t dataLen)
     uint8_t remainLen = dataLen;
     while (0 != remainLen)
     {
+        while (USART_GetFlagStatus(LoraCom, USART_FLAG_TC) != SET)
+            ; //DMA 完成不等于串口发送完成，要等待串口发送完成，不然丢数据
+        SetWakeState(RESET);
+        DelayUs(6000);
+        SetWakeState(SET);
         len = LORA_SEND_BUFF_SIZE <= remainLen ? LORA_SEND_BUFF_SIZE : remainLen;
         memcpy(LORA_SEND_BUFF, data + pos, len);
         DMA_Cmd(LORA_DMA_TX, DISABLE);
         DMA_SetCurrDataCounter(LORA_DMA_TX, len);
         DMA_Cmd(LORA_DMA_TX, ENABLE);
+        Debug("SendLora dataLen:%d len:%d", dataLen, len);
         //USART_DMACmd(LoraCom, USART_DMAReq_TX, ENABLE);
         pos = pos + len;
         remainLen = remainLen - len;
+        IsLoraSend = TRUE;
     }
 }
 
@@ -181,11 +200,10 @@ void ResetDevRx()
     DMA_Cmd(DEV_DMA_RX, DISABLE);
     DMA_SetCurrDataCounter(DEV_DMA_RX, DEV_RECV_BUFF_SIZE);
     DMA_Cmd(DEV_DMA_RX, ENABLE);
-    //USART_DMACmd(DevCom, USART_DMAReq_RX, ENABLE);
     DevCom->SR;
     DevCom->DR;
-    DMA_ClearITPendingBit(DEV_DMA_FLAG_TCRX);
-    USART_ClearFlag(DevCom, USART_FLAG_IDLE);
+    //DMA_ClearFlag(DEV_DMA_FLAG_TCRX);
+    //USART_ClearFlag(DevCom, USART_FLAG_IDLE);
 }
 
 void ResetLoraRx()
@@ -193,11 +211,10 @@ void ResetLoraRx()
     DMA_Cmd(LORA_DMA_RX, DISABLE);
     DMA_SetCurrDataCounter(LORA_DMA_RX, LORA_RECV_BUFF_SIZE);
     DMA_Cmd(LORA_DMA_RX, ENABLE);
-    //USART_DMACmd(LoraCom, USART_DMAReq_RX, ENABLE);
     LoraCom->SR;
     LoraCom->DR;
-    DMA_ClearITPendingBit(LORA_DMA_FLAG_TCRX);
-    USART_ClearFlag(LoraCom, USART_FLAG_IDLE);
+    //DMA_ClearFlag(LORA_DMA_FLAG_TCRX);
+    //USART_ClearFlag(LoraCom, USART_FLAG_IDLE);
 }
 
 int putchar(int c)
@@ -228,3 +245,6 @@ void ShowString(char *str)
         putchar(*str++);
     }
 }
+
+//BUG:包比较大的时候就卡主了 49以下可以，超过49则死掉了,原因是一直进中断了-OK
+//BUG:缓存满了之后紧跟的数据会掉

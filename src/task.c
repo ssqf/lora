@@ -2,7 +2,7 @@
 
 #include "lora.h"
 
-#define LISTSIZE 50
+#define LISTSIZE 30
 int8_t head = 0;
 int8_t tail = 0;
 int8_t listLen = 0;
@@ -104,8 +104,8 @@ void HandleTask()
             SetRS485CTL(RESET);
             break;
         case LORA_SEND_COMPLETE:
-            //while (USART_GetFlagStatus(LoraCom, USART_FLAG_TC) != SET); //DMA 完成不等于串口发送完成，要等待串口发送完成，不然丢数据
-            //SetHostWakeState(RESET);
+            while (USART_GetFlagStatus(LoraCom, USART_FLAG_TC) != SET)
+                ; //DMA 完成不等于串口发送完成，要等待串口发送完成，不然丢数据
             break;
         case LORA_DATA_SEND:
             SetWakeState(SET);
