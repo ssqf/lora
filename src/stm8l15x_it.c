@@ -172,8 +172,12 @@ INTERRUPT_HANDLER(TIM2_CC_USART2_RX_IRQHandler, 20)
   {
     uint8_t curPos = DEV_RECV_BUFF_SIZE - DMA_GetCurrDataCounter(DEV_DMA_RX);
     uint8_t len = curPos - DevRecvPos;
-    bool rst = PushDataDevBuff(&DEV_RECV_BUFF[DevRecvPos], len);
-    PushTask(DEV_RECV_DATA);
+    bool rst;
+    if (len != 0)
+    {
+      rst = PushDataDevBuff(&DEV_RECV_BUFF[DevRecvPos], len);
+      PushTask(DEV_RECV_DATA);
+    }
     DevRecvPos = curPos;
     DevCom->SR;
     DevCom->DR;
@@ -255,8 +259,12 @@ INTERRUPT_HANDLER(USART1_RX_TIM5_CC_IRQHandler, 28)
   {
     uint8_t curPos = LORA_RECV_BUFF_SIZE - DMA_GetCurrDataCounter(LORA_DMA_RX);
     uint8_t len = curPos - LoraRecvPos;
-    bool rst = PushDataLoraBuff(&LORA_RECV_BUFF[LoraRecvPos], len);
-    PushTask(LORA_RECV_DATA);
+    bool rst ;
+    if (len != 0)
+    {
+      rst = PushDataLoraBuff(&LORA_RECV_BUFF[LoraRecvPos], len);
+      PushTask(LORA_RECV_DATA);
+    }
     LoraRecvPos = curPos;
     LoraCom->SR;
     LoraCom->DR;

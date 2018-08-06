@@ -7,6 +7,7 @@ uint32_t Second = 0;
 uint8_t TickNum = 0;
 static void time2Config(void);
 //static void dalayTimer1Init();
+void restartTask(uint8_t time);
 
 void InitClock()
 {
@@ -68,9 +69,13 @@ bool DelaySendTask(uint16_t ms, TaskType t)
             {
                 uint16_t counter = TIM1_GetCounter();
                 Debug("ms:%d,counter:%d", ms, counter);
-                if (ms <= counter)
+                if (ms <= counter) //延时小于当前延时，则停止当前延时重启新的最小延时
                 {
-                    delayTaskList[i].delay = 1; //0 timer终端不能启动
+                    DelayTask *t = GetCurrTask();
+                    t->delay -= counter;
+                    delayTaskList[i].delay = ms; //0 timer终端不能启动
+                    t = GetMinTask();
+                    restartTask(t->delay);
                 }
                 else
                 {
@@ -148,4 +153,9 @@ void StartNextDelyaTask(uint16_t time)
     TIM1_Cmd(ENABLE);
 }
 
+void restartTask(uint8_t time)
+{
+    TIM1_Cmd(DISABLE);
+    StartNextDelyaTask(time);
+}
 //BUG:延迟队列中如果新插入的比当前执行定时短则会乱掉,不要不停的进入退出AT模式

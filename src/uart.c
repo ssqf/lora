@@ -86,13 +86,29 @@ static void initDeviceUart()
     GPIO_ExternalPullUpConfig(GPIOE, GPIO_Pin_3, ENABLE);
     GPIO_ExternalPullUpConfig(GPIOE, GPIO_Pin_4, ENABLE);
 
-    USART_Init(DevCom, DevBaudRate, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Rx | USART_Mode_Tx);
+    USART_Init(DevCom, conf.DevType ? 9600 : 115200, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Rx | USART_Mode_Tx);
     //USART_Init(DevCom, DevBaudRate, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Rx);
     //USART_DMACmd(DevCom, USART_DMAReq_TX, ENABLE);
     //USART_DMACmd(DevCom, USART_DMAReq_RX, ENABLE);
     USART_ITConfig(DevCom, USART_IT_IDLE, ENABLE);
     //USART_ITConfig(DevCom, USART_IT_TC, ENABLE);
     USART_Cmd(DevCom, DISABLE);
+}
+
+void ReOpenDevUart(uint32_t BaudRate, USART_WordLength_TypeDef USART_WordLength, USART_StopBits_TypeDef USART_StopBits,
+                   USART_Parity_TypeDef USART_Parity)
+{
+    USART_Cmd(DevCom, DISABLE);
+    USART_Init(DevCom, BaudRate, USART_WordLength, USART_StopBits, USART_Parity, USART_Mode_Rx | USART_Mode_Tx);
+    USART_Cmd(DevCom, ENABLE);
+}
+
+void ReOpenLoraUart(uint32_t BaudRate, USART_WordLength_TypeDef USART_WordLength, USART_StopBits_TypeDef USART_StopBits,
+                    USART_Parity_TypeDef USART_Parity)
+{
+    USART_Cmd(LoraCom, DISABLE);
+    USART_Init(LoraCom, BaudRate, USART_WordLength, USART_StopBits, USART_Parity, USART_Mode_Rx | USART_Mode_Tx);
+    USART_Cmd(LoraCom, ENABLE);
 }
 
 static void initLoraUart()
@@ -126,13 +142,12 @@ void SendDevice(uint8_t *data, uint8_t dataLen)
         memcpy(DEV_SEND_BUFF, data + pos, len);
         DMA_Cmd(DEV_DMA_TX, DISABLE);
         DMA_SetCurrDataCounter(DEV_DMA_TX, len);
-        DMA_Cmd(DEV_DMA_TX, ENABLE);
         SetRS485CTL(SET);
+        DMA_Cmd(DEV_DMA_TX, ENABLE);
         //USART_DMACmd(DevCom, USART_DMAReq_TX, ENABLE);
         Debug("SendDevice len:%d", len);
         pos = pos + len;
         remainLen = remainLen - len;
-        IsDevSend = TRUE;
     }
 }
 
@@ -157,7 +172,6 @@ void SendLora(uint8_t *data, uint8_t dataLen)
         //USART_DMACmd(LoraCom, USART_DMAReq_TX, ENABLE);
         pos = pos + len;
         remainLen = remainLen - len;
-        IsLoraSend = TRUE;
     }
 }
 

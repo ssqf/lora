@@ -6,7 +6,8 @@
         "stm8l15x.h": "c",
         "stm8l15x_adc.h": "c",
         "stm8l15x_it.h": "c",
-        "stm8l15x_clk.h": "c"
+        "stm8l15x_clk.h": "c",
+        "lora.h": "c"
     },
     "C_Cpp.intelliSenseEngineFallback": "Disabled"
 }

@@ -16,7 +16,7 @@
         <ShowSource>1</ShowSource>
     </Trace1>
     <DebugChecksum>
-        <Checksum>321794562</Checksum>
+        <Checksum>2431097873</Checksum>
     </DebugChecksum>
     <CodeCoverage>
         <Enabled>_ 0</Enabled>
@@ -67,7 +67,7 @@
         <Bp0>_ 0 "STD_CODE2" "{d:\documents\lora\libs\src\stm8l10x_i2c.c}.226.1" 0 0 1 "" 0 ""</Bp0>
         <Bp1>_ 0 "STD_CODE2" "{$PROJ_DIR$\inc\config.h}.26.1" 0 0 1 "" 0 ""</Bp1>
         <Bp2>_ 1 "STD_CODE2" "{$PROJ_DIR$\main.c}.5.3" 0 0 1 "" 0 ""</Bp2>
-        <Bp3>_ 1 "STD_CODE2" "{$PROJ_DIR$\src\stm8l15x_it.c}.310.1" 0 0 1 "" 0 ""</Bp3>
+        <Bp3>_ 1 "STD_CODE2" "{$PROJ_DIR$\src\stm8l15x_it.c}.0.1" 0 0 1 "" 0 ""</Bp3>
         <Count>4</Count>
     </Breakpoints2>
     <Interrupts>
@@ -85,11 +85,26 @@
         <FreqHi>0</FreqHi>
         <MultiCoreRunAll>1</MultiCoreRunAll>
     </Simulator>
+    <struct_types>
+        <Fmt0>DevConfig-ConfFlag	4	0</Fmt0>
+        <Fmt1>DevConfig-LoraAddr	4	0</Fmt1>
+        <Fmt2>DevConfig-SN	4	0</Fmt2>
+        <Fmt3>DevConfig-cmd1Period	4	0</Fmt3>
+        <Fmt4>DevConfig-cmd2Len	4	0</Fmt4>
+        <Fmt5>DevConfig-cmd2Period	4	0</Fmt5>
+        <Fmt6>DevConfig-cmd3Len	4	0</Fmt6>
+        <Fmt7>DevConfig-cmd3Period	4	0</Fmt7>
+        <Fmt8>DevConfig-fitter1Len	4	0</Fmt8>
+    </struct_types>
     <DataSample>
         <LogEnabled>0</LogEnabled>
         <GraphEnabled>0</GraphEnabled>
         <ShowTimeLog>1</ShowTimeLog>
     </DataSample>
+    <TermIOLog>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ ""</LogFile>
+    </TermIOLog>
     <Breakpoints>
         <Bp0>_ "STD_DATA" "InitDevice" 1 0 0 3 0 "" 0 ""</Bp0>
         <Count>1</Count>
@@ -99,10 +114,6 @@
         <LogFile>_ ""</LogFile>
         <Category>_ 0</Category>
     </LogFile>
-    <TermIOLog>
-        <LoggingEnabled>_ 0</LoggingEnabled>
-        <LogFile>_ ""</LogFile>
-    </TermIOLog>
     <Aliases>
         <Count>0</Count>
         <SuppressDialog>0</SuppressDialog>

@@ -95,7 +95,15 @@ void HandleTask()
             //SendDevice("LORA_RECV_DATA\n", 16);
             break;
         case DEV_RECV_DATA:
-            HandleDevData();
+            if (GPRS_AT_Status == DEV_DATA_TRANSFER)
+            {
+                HandleDevData();
+            }
+            else
+            {
+                HandGPRSATModel();
+            }
+
             //PushTask(LORA_DATA_SEND);
             break;
         case DEV_SEND_COMPLETE:
@@ -120,12 +128,11 @@ void HandleTask()
         case ENTER_ATMODLE_TIMEOUT:
             EnterAtModelTimeout();
             break;
-        case EXIT_AT_TIMEOUT:
-            if (AT_Status == LORA_READY_EXIT_ATCMD)
-            {
-                SendLora("AT+ENTM\r\n", 9);
-            }
-
+        case ENTER_GPRS_AT:
+            EnterGPRS_AT();
+            break;
+        case ENTER_GPRS_AT_TIMEOUT:
+            EnterGPRS_AT_TIMEOUT();
             break;
         }
     }

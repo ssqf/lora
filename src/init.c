@@ -4,11 +4,26 @@ void initCLK();
 void InitDevice()
 {
     initCLK();
+    DelayUs(20000); //时钟初始化后可能不稳定，要加延时
+    InitLoraPin();
+    InitConf();
     InitUart();
     InitClock();
     InitTask();
+    if (conf.DevType == 0) //网关
+    {
+        InitGPRSConf();
+    }
+    // if (conf.DevType == 0) //网关
+    // {
+    //     InitGPRSConf();
+    //     InitLoraConf();
+    // }
+    // else
+    // {
+    //     InitLoraConf();
+    // }
     enableInterrupts();
-    InitLoraPin();
 }
 
 void initCLK()

@@ -1,6 +1,7 @@
 #ifndef __LORA_H
 #define __LORA_H
 #include "stm8l15x_conf.h"
+#include "stm8l15x_flash.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

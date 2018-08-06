@@ -47,20 +47,20 @@
                 <option>
                     <name>GenRuntimeLibSelect</name>
                     <version>0</version>
-                    <state>1</state>
+                    <state>2</state>
                 </option>
                 <option>
                     <name>GenRuntimeLibSelectSlave</name>
                     <version>0</version>
-                    <state>1</state>
+                    <state>2</state>
                 </option>
                 <option>
                     <name>GenRTDescription</name>
-                    <state>Use the normal configuration of the C/EC++ runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
+                    <state>Use the full configuration of the C/EC++ runtime library. Full locale interface, C locale, file descriptor support, multibytes in printf and scanf, and hex floats in strtod.</state>
                 </option>
                 <option>
                     <name>GenRTConfigPath</name>
-                    <state>$TOOLKIT_DIR$\LIB\dlstm8smn.h</state>
+                    <state>$TOOLKIT_DIR$\LIB\dlstm8smf.h</state>
                 </option>
                 <option>
                     <name>GenLibInFormatter</name>
@@ -74,11 +74,11 @@
                 <option>
                     <name>GenLibOutFormatter</name>
                     <version>0</version>
-                    <state>2</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>GenLibOutFormatterDescription</name>
-                    <state>Full formatting, without multibytes.</state>
+                    <state>Full formatting.</state>
                 </option>
                 <option>
                     <name>GenStackSize</name>
