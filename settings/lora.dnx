@@ -95,16 +95,14 @@
         <Fmt6>DevConfig-cmd3Len	4	0</Fmt6>
         <Fmt7>DevConfig-cmd3Period	4	0</Fmt7>
         <Fmt8>DevConfig-fitter1Len	4	0</Fmt8>
+        <Fmt9>DevConfig-fitter1Parm	4	0</Fmt9>
+        <Fmt10>DevConfig-fitter2Parm	4	0</Fmt10>
     </struct_types>
     <DataSample>
         <LogEnabled>0</LogEnabled>
         <GraphEnabled>0</GraphEnabled>
         <ShowTimeLog>1</ShowTimeLog>
     </DataSample>
-    <TermIOLog>
-        <LoggingEnabled>_ 0</LoggingEnabled>
-        <LogFile>_ ""</LogFile>
-    </TermIOLog>
     <Breakpoints>
         <Bp0>_ "STD_DATA" "InitDevice" 1 0 0 3 0 "" 0 ""</Bp0>
         <Count>1</Count>
@@ -114,6 +112,10 @@
         <LogFile>_ ""</LogFile>
         <Category>_ 0</Category>
     </LogFile>
+    <TermIOLog>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ ""</LogFile>
+    </TermIOLog>
     <Aliases>
         <Count>0</Count>
         <SuppressDialog>0</SuppressDialog>
