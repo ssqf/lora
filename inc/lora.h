@@ -15,9 +15,6 @@
 
 //#define NULL ((void *)0)
 
-extern uint32_t Second;
-extern uint8_t TickNum;
-
 #define __DEBUG__
 
 #ifdef __DEBUG__

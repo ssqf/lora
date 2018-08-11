@@ -50,7 +50,7 @@ INTERRUPT_HANDLER(DMA1_CHANNEL2_3_IRQHandler, 3)
     PushTask(LORA_RECV_DATA);
     LoraRecvPos = currPos;
     DMA_ClearFlag(DMA1_FLAG_HT2);
-    Debug("Lora HF Rx:%d push rst:%d currPos:%d LoraRecvPos:%d", len, rst, currPos, LoraRecvPos);
+    Debug("Lora HF Rx:%u push rst:%u currPos:%u LoraRecvPos:%u", len, rst, currPos, LoraRecvPos);
   }
 
   //LORA DMA 接收数据完成
@@ -61,7 +61,7 @@ INTERRUPT_HANDLER(DMA1_CHANNEL2_3_IRQHandler, 3)
     PushTask(LORA_RECV_DATA);
     LoraRecvPos = 0;
     DMA_ClearFlag(LORA_DMA_FLAG_TCRX);
-    Debug("Lora TC Rx:%d push rst:%d currPos:%d LoraRecvPos:%d", len, rst, LORA_RECV_BUFF_SIZE, LoraRecvPos);
+    Debug("Lora TC Rx:%u push rst:%u currPos:%u LoraRecvPos:%u", len, rst, LORA_RECV_BUFF_SIZE, LoraRecvPos);
   }
 
   //Dev DMA 接收数据一半
@@ -73,7 +73,7 @@ INTERRUPT_HANDLER(DMA1_CHANNEL2_3_IRQHandler, 3)
     PushTask(DEV_RECV_DATA);
     DevRecvPos = currPos;
     DMA_ClearFlag(DMA1_FLAG_HT3);
-    Debug("Dev HF Rx:%d push rst:%d currPos:%d DevRecvPos:%d", len, rst, currPos, DevRecvPos);
+    Debug("Dev HF Rx:%u push rst:%u currPos:%u DevRecvPos:%u", len, rst, currPos, DevRecvPos);
   }
 
   //DEV DMA 接收数据完成
@@ -84,7 +84,7 @@ INTERRUPT_HANDLER(DMA1_CHANNEL2_3_IRQHandler, 3)
     PushTask(DEV_RECV_DATA);
     DevRecvPos = 0;
     DMA_ClearFlag(DEV_DMA_FLAG_TCRX);
-    Debug("Dev TC Rx:%d push rst:%d currPos:%d DevRecvPos:%d", len, rst, DEV_RECV_BUFF_SIZE, DevRecvPos);
+    Debug("Dev TC Rx:%u push rst:%u currPos:%u DevRecvPos:%u", len, rst, DEV_RECV_BUFF_SIZE, DevRecvPos);
   }
 }
 
@@ -154,7 +154,7 @@ INTERRUPT_HANDLER(TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler, 19)
   {
     TIM2_ClearITPendingBit(TIM2_IT_Update);
     TickNum++;
-    if (TickNum >= 50)
+    if (TickNum >= TickPerSecond)
     {
       TickNum = 0;
       Second++;
@@ -182,7 +182,7 @@ INTERRUPT_HANDLER(TIM2_CC_USART2_RX_IRQHandler, 20)
     DevCom->SR;
     DevCom->DR;
     USART_ClearFlag(DevCom, USART_FLAG_IDLE);
-    Debug("Dev idle Rx:%d push rst:%d curPos:%d DevRecvPos:%d", len, rst, curPos, DevRecvPos);
+    Debug("Dev idle Rx:%u push rst:%u curPos:%u DevRecvPos:%u", len, rst, curPos, DevRecvPos);
   }
   // if (USART_GetFlagStatus(DevCom, USART_FLAG_IDLE))
   // {
@@ -190,7 +190,7 @@ INTERRUPT_HANDLER(TIM2_CC_USART2_RX_IRQHandler, 20)
   //   bool rst = PushDataDevBuff(&DEV_RECV_BUFF[DevRecvPos], len);
   //   PushTask(DEV_RECV_DATA);
   //   ResetDevRx();
-  //   Debug("Dev idle Rx:%d push rst:%d", len, rst);
+  //   Debug("Dev idle Rx:%u push rst:%u", len, rst);
   // }
 }
 
@@ -216,7 +216,7 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_COM_IRQHandler, 23)
     {
       PushTask(t->t);
       t->used = FALSE;
-      Debug("Timer1 Push:%d", t->t);
+      Debug("Timer1 Push:%u", t->t);
     }
     else
     {
@@ -227,7 +227,7 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_COM_IRQHandler, 23)
     {
 
       StartNextDelyaTask(minTask->delay);
-      Debug("Next delay %d task:%d", minTask->delay, minTask->t);
+      Debug("Next delay %u task:%u", minTask->delay, minTask->t);
     }
     else
     {
@@ -259,7 +259,7 @@ INTERRUPT_HANDLER(USART1_RX_TIM5_CC_IRQHandler, 28)
   {
     uint8_t curPos = LORA_RECV_BUFF_SIZE - DMA_GetCurrDataCounter(LORA_DMA_RX);
     uint8_t len = curPos - LoraRecvPos;
-    bool rst ;
+    bool rst;
     if (len != 0)
     {
       rst = PushDataLoraBuff(&LORA_RECV_BUFF[LoraRecvPos], len);
@@ -269,7 +269,7 @@ INTERRUPT_HANDLER(USART1_RX_TIM5_CC_IRQHandler, 28)
     LoraCom->SR;
     LoraCom->DR;
     USART_ClearFlag(LoraCom, USART_FLAG_IDLE);
-    Debug("Lora idle Rx:%d push rst:%d curPos:%d LoraRecvPos:%d", len, rst, curPos, LoraRecvPos);
+    Debug("Lora idle Rx:%u push rst:%u curPos:%u LoraRecvPos:%u", len, rst, curPos, LoraRecvPos);
   }
   // if (USART_GetFlagStatus(LoraCom, USART_FLAG_IDLE))
   // {
@@ -277,7 +277,7 @@ INTERRUPT_HANDLER(USART1_RX_TIM5_CC_IRQHandler, 28)
   //   bool rst = PushDataLoraBuff(&LORA_RECV_BUFF[LoraRecvPos], len);
   //   PushTask(LORA_RECV_DATA);
   //   ResetLoraRx();
-  //   Debug("Lora idle Rx:%d push rst:%d", len, rst);
+  //   Debug("Lora idle Rx:%u push rst:%u", len, rst);
   // }
 }
 

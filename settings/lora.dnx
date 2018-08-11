@@ -16,7 +16,7 @@
         <ShowSource>1</ShowSource>
     </Trace1>
     <DebugChecksum>
-        <Checksum>2431097873</Checksum>
+        <Checksum>3199954004</Checksum>
     </DebugChecksum>
     <CodeCoverage>
         <Enabled>_ 0</Enabled>
@@ -89,24 +89,12 @@
         <Fmt0>DevConfig-ConfFlag	4	0</Fmt0>
         <Fmt1>DevConfig-LoraAddr	4	0</Fmt1>
         <Fmt2>DevConfig-SN	4	0</Fmt2>
-        <Fmt3>DevConfig-cmd1Period	4	0</Fmt3>
-        <Fmt4>DevConfig-cmd2Len	4	0</Fmt4>
-        <Fmt5>DevConfig-cmd2Period	4	0</Fmt5>
-        <Fmt6>DevConfig-cmd3Len	4	0</Fmt6>
-        <Fmt7>DevConfig-cmd3Period	4	0</Fmt7>
-        <Fmt8>DevConfig-fitter1Len	4	0</Fmt8>
-        <Fmt9>DevConfig-fitter1Parm	4	0</Fmt9>
-        <Fmt10>DevConfig-fitter2Parm	4	0</Fmt10>
     </struct_types>
     <DataSample>
         <LogEnabled>0</LogEnabled>
         <GraphEnabled>0</GraphEnabled>
         <ShowTimeLog>1</ShowTimeLog>
     </DataSample>
-    <Breakpoints>
-        <Bp0>_ "STD_DATA" "InitDevice" 1 0 0 3 0 "" 0 ""</Bp0>
-        <Count>1</Count>
-    </Breakpoints>
     <LogFile>
         <LoggingEnabled>_ 0</LoggingEnabled>
         <LogFile>_ ""</LogFile>
@@ -116,6 +104,10 @@
         <LoggingEnabled>_ 0</LoggingEnabled>
         <LogFile>_ ""</LogFile>
     </TermIOLog>
+    <Breakpoints>
+        <Bp0>_ "STD_DATA" "InitDevice" 1 0 0 3 0 "" 0 ""</Bp0>
+        <Count>1</Count>
+    </Breakpoints>
     <Aliases>
         <Count>0</Count>
         <SuppressDialog>0</SuppressDialog>

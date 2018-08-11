@@ -2,12 +2,11 @@
 // 每秒分三个阶段；1,20ms-300ms定时类设备发送给网关数据;2,320ms-600ms网关给设备发送数据；3，620ms-1000ms告警类设备
 //
 #include "lora.h"
-#define TIM2_PERIOD 20000 //20ms 1MHz 16分频
-uint32_t Second = 0;
-uint8_t TickNum = 0;
+uint32_t Second;
+uint8_t TickNum;
 static void time2Config(void);
 //static void dalayTimer1Init();
-void restartTask(uint8_t time);
+void restartTask(uint16_t time);
 
 void InitClock()
 {
@@ -26,7 +25,7 @@ static void time2Config(void)
     TIM2_Cmd(ENABLE);
 }
 
-void SyncTime(uint32_t s, uint8_t t, uint16_t counter)
+void SyncTimeToLoacl(uint32_t s, uint8_t t, uint16_t counter)
 {
     Second = s;
     TickNum = t;
@@ -46,21 +45,22 @@ void SyncTime(uint32_t s, uint8_t t, uint16_t counter)
 //     TIM1_Cmd(DISABLE);
 // }
 
-#define delayTaskSize 10
+#define delayTaskSize 20
 #define invalidCurrIndex -1 //-1无任务
 DelayTask delayTaskList[delayTaskSize];
 int curTaskIndex = invalidCurrIndex;
 
 bool DelaySendTask(uint16_t ms, TaskType t)
 {
+    Debug("DelaySendTask:%ums,%u", ms, t);
     for (uint8_t i = 0; i < delayTaskSize; i++)
     {
-        if (!delayTaskList[i].used)
+        if (!delayTaskList[i].used) //找到一个未被使用的延迟任务位置
         {
-            delayTaskList[i].t = t;
+            delayTaskList[i].t = t; //将任务保存
             delayTaskList[i].used = TRUE;
 
-            if (!(TIM1->CR1 & TIM_CR1_CEN))
+            if (!(TIM1->CR1 & TIM_CR1_CEN)) //当前延迟任务队列没有运行
             {
                 delayTaskList[i].delay = ms;
                 PushTask(START_DELAY_TASK);
@@ -68,8 +68,8 @@ bool DelaySendTask(uint16_t ms, TaskType t)
             else
             {
                 uint16_t counter = TIM1_GetCounter();
-                Debug("ms:%d,counter:%d", ms, counter);
-                if (ms <= counter) //延时小于当前延时，则停止当前延时重启新的最小延时
+                Debug("ms:%u,counter:%u", ms, counter);
+                if (ms <= counter) //延时小于当前延时，则停止当前延时，重启新的最小延时
                 {
                     DelayTask *t = GetCurrTask();
                     t->delay -= counter;
@@ -153,9 +153,8 @@ void StartNextDelyaTask(uint16_t time)
     TIM1_Cmd(ENABLE);
 }
 
-void restartTask(uint8_t time)
+void restartTask(uint16_t time)
 {
     TIM1_Cmd(DISABLE);
     StartNextDelyaTask(time);
 }
-//BUG:延迟队列中如果新插入的比当前执行定时短则会乱掉,不要不停的进入退出AT模式

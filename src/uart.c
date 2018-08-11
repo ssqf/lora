@@ -23,13 +23,13 @@ uint8_t DevRecvPos = 0;
 
 void InitUart()
 {
-    initRS458CTL();
-    initDeviceUart();
-    initLoraUart();
-
 #ifdef __DEBUG__
     initUart3();
 #endif
+
+    initRS458CTL();
+    initDeviceUart();
+    initLoraUart();
 
     initDMA();
     USART_Cmd(DevCom, ENABLE);
@@ -86,29 +86,26 @@ static void initDeviceUart()
     GPIO_ExternalPullUpConfig(GPIOE, GPIO_Pin_3, ENABLE);
     GPIO_ExternalPullUpConfig(GPIOE, GPIO_Pin_4, ENABLE);
 
-    USART_Init(DevCom, conf.DevType ? 9600 : 115200, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Rx | USART_Mode_Tx);
+    USART_Init(DevCom, buad[Conf.DevBaudRate], (USART_WordLength_TypeDef)Conf.DevDataBit, (USART_StopBits_TypeDef)Conf.DevStopBit, (USART_Parity_TypeDef)Conf.DevParityBit, USART_Mode_Rx | USART_Mode_Tx);
     //USART_Init(DevCom, DevBaudRate, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Rx);
     //USART_DMACmd(DevCom, USART_DMAReq_TX, ENABLE);
     //USART_DMACmd(DevCom, USART_DMAReq_RX, ENABLE);
     USART_ITConfig(DevCom, USART_IT_IDLE, ENABLE);
     //USART_ITConfig(DevCom, USART_IT_TC, ENABLE);
     USART_Cmd(DevCom, DISABLE);
+    Debug("initDeviceUart:%lu,%u,%u,%u", buad[Conf.DevBaudRate], Conf.DevDataBit, Conf.DevStopBit, Conf.DevParityBit);
 }
 
-void ReOpenDevUart(uint32_t BaudRate, USART_WordLength_TypeDef USART_WordLength, USART_StopBits_TypeDef USART_StopBits,
-                   USART_Parity_TypeDef USART_Parity)
+void ReConfDeviceUart()
 {
     USART_Cmd(DevCom, DISABLE);
-    USART_Init(DevCom, BaudRate, USART_WordLength, USART_StopBits, USART_Parity, USART_Mode_Rx | USART_Mode_Tx);
+    USART_DMACmd(DevCom, USART_DMAReq_TX, DISABLE);
+    USART_DMACmd(DevCom, USART_DMAReq_RX, DISABLE);
+    USART_Init(DevCom, buad[Conf.DevBaudRate], (USART_WordLength_TypeDef)Conf.DevDataBit, (USART_StopBits_TypeDef)Conf.DevStopBit, (USART_Parity_TypeDef)Conf.DevParityBit, USART_Mode_Rx | USART_Mode_Tx);
+    USART_DMACmd(DevCom, USART_DMAReq_TX, ENABLE);
+    USART_DMACmd(DevCom, USART_DMAReq_RX, ENABLE);
     USART_Cmd(DevCom, ENABLE);
-}
-
-void ReOpenLoraUart(uint32_t BaudRate, USART_WordLength_TypeDef USART_WordLength, USART_StopBits_TypeDef USART_StopBits,
-                    USART_Parity_TypeDef USART_Parity)
-{
-    USART_Cmd(LoraCom, DISABLE);
-    USART_Init(LoraCom, BaudRate, USART_WordLength, USART_StopBits, USART_Parity, USART_Mode_Rx | USART_Mode_Tx);
-    USART_Cmd(LoraCom, ENABLE);
+    Debug("ReConfDeviceUart:%lu,%u,%u,%u", buad[Conf.DevBaudRate], Conf.DevDataBit, Conf.DevStopBit, Conf.DevParityBit);
 }
 
 static void initLoraUart()
@@ -120,12 +117,13 @@ static void initLoraUart()
     GPIO_ExternalPullUpConfig(GPIOC, GPIO_Pin_2, ENABLE);
     GPIO_ExternalPullUpConfig(GPIOC, GPIO_Pin_3, ENABLE);
 
-    USART_Init(LoraCom, LoraBaudRate, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, USART_Mode_Rx | USART_Mode_Tx);
+    USART_Init(LoraCom, buad[Conf.LoraBaudRate], (USART_WordLength_TypeDef)Conf.LoraDataBit, (USART_StopBits_TypeDef)Conf.LoraStopBit, (USART_Parity_TypeDef)Conf.LoraParityBit, USART_Mode_Rx | USART_Mode_Tx);
     //USART_DMACmd(LoraCom, USART_DMAReq_TX, ENABLE);
     //USART_DMACmd(LoraCom, USART_DMAReq_RX, ENABLE);
     USART_ITConfig(LoraCom, USART_IT_IDLE, ENABLE);
     //USART_ITConfig(LoraCom, USART_IT_TC, ENABLE);
     USART_Cmd(DevCom, DISABLE);
+    Debug("initLoraUart:%lu,%u,%u,%u", buad[Conf.LoraBaudRate], Conf.LoraDataBit, Conf.LoraStopBit, Conf.LoraParityBit);
 }
 
 void SendDevice(uint8_t *data, uint8_t dataLen)
@@ -145,7 +143,32 @@ void SendDevice(uint8_t *data, uint8_t dataLen)
         SetRS485CTL(SET);
         DMA_Cmd(DEV_DMA_TX, ENABLE);
         //USART_DMACmd(DevCom, USART_DMAReq_TX, ENABLE);
-        Debug("SendDevice len:%d", len);
+        Debug("SendDevice len:%u", len);
+        pos = pos + len;
+        remainLen = remainLen - len;
+    }
+}
+
+void SendCmdToDevice(uint8_t cmdNum)
+{
+    uint8_t len = 0;
+    uint8_t pos = 0;
+    uint8_t remainLen = Conf.cmdLen[cmdNum];
+    uint32_t data = (CmdFlashAddr + (uint32_t)cmdNum * (uint32_t)FLASH_BLOCK_SIZE);
+
+    while (0 != remainLen)
+    {
+        while (USART_GetFlagStatus(DevCom, USART_FLAG_TC) != SET) //DMA 完成不等于串口发送完成，要等待串口发送完成，不然丢数据
+            ;
+
+        len = DEV_SEND_BUFF_SIZE <= remainLen ? DEV_SEND_BUFF_SIZE : remainLen;
+        memcpy(DEV_SEND_BUFF, (void const *)(data + pos), len);
+        DMA_Cmd(DEV_DMA_TX, DISABLE);
+        DMA_SetCurrDataCounter(DEV_DMA_TX, len);
+        SetRS485CTL(SET);
+        DMA_Cmd(DEV_DMA_TX, ENABLE);
+        //USART_DMACmd(DevCom, USART_DMAReq_TX, ENABLE);
+        Debug("SendDevice len:%u", len);
         pos = pos + len;
         remainLen = remainLen - len;
     }
@@ -168,7 +191,7 @@ void SendLora(uint8_t *data, uint8_t dataLen)
         DMA_Cmd(LORA_DMA_TX, DISABLE);
         DMA_SetCurrDataCounter(LORA_DMA_TX, len);
         DMA_Cmd(LORA_DMA_TX, ENABLE);
-        Debug("SendLora dataLen:%d len:%d", dataLen, len);
+        Debug("SendLora dataLen:%u len:%u", dataLen, len);
         //USART_DMACmd(LoraCom, USART_DMAReq_TX, ENABLE);
         pos = pos + len;
         remainLen = remainLen - len;
@@ -259,6 +282,3 @@ void ShowString(char *str)
         putchar(*str++);
     }
 }
-
-//BUG:包比较大的时候就卡主了 49以下可以，超过49则死掉了,原因是一直进中断了-OK
-//BUG:缓存满了之后紧跟的数据会掉

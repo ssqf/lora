@@ -3,8 +3,7 @@
 int main(void)
 {
   InitDevice();
-  Debug("Hello LoRa!! Serial Number:%#X%X", (unsigned int)(conf.SN >> 16), (unsigned int)conf.SN);
-
+  Debug("Hello LoRa!! Serial Number:%#lX,DevType:%u", Conf.SN, Conf.DevType);
   while (1)
   {
     HandleTask();

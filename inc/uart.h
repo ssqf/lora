@@ -51,5 +51,7 @@ extern void InitUart();
 extern void ResetDevRx();
 extern void ResetLoraRx();
 extern void SetLoraReadySend();
+extern void ReConfDeviceUart();
+extern void SendCmdToDevice(uint8_t cmdNum);
 
 #endif // !__UART_H

@@ -18,14 +18,13 @@ Enable Serial=1
 Start addr=98288
 Length=4
 High Base=0
-Low Base=268435461
+Low Base=268435462
 Step=1
 Little Endian=0
 [OPTION BYTE]
 Count=0
 [DATA MEMORY]
-Count=1
-File0=D:\我的文档\lora\config.hex
+Count=0
 [PROGRAM MEMORY]
 Count=1
 File0=D:\我的文档\lora\Debug\Exe\lora.hex

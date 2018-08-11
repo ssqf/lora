@@ -2138,28 +2138,10 @@
                 <name>$PROJ_DIR$\libs\inc\stm8l15x.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\libs\inc\stm8l15x_adc.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\inc\stm8l15x_aes.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\inc\stm8l15x_beep.h</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\libs\inc\stm8l15x_clk.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\libs\inc\stm8l15x_comp.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\inc\stm8l15x_dac.h</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\libs\inc\stm8l15x_dma.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\inc\stm8l15x_exti.h</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\libs\inc\stm8l15x_flash.h</name>
@@ -2168,31 +2150,10 @@
                 <name>$PROJ_DIR$\libs\inc\stm8l15x_gpio.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\libs\inc\stm8l15x_i2c.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\inc\stm8l15x_irtim.h</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\libs\inc\stm8l15x_itc.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\libs\inc\stm8l15x_iwdg.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\inc\stm8l15x_lcd.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\inc\stm8l15x_pwr.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\inc\stm8l15x_rst.h</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\libs\inc\stm8l15x_rtc.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\inc\stm8l15x_spi.h</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\libs\inc\stm8l15x_syscfg.h</name>
@@ -2204,19 +2165,7 @@
                 <name>$PROJ_DIR$\libs\inc\stm8l15x_tim2.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\libs\inc\stm8l15x_tim3.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\inc\stm8l15x_tim4.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\inc\stm8l15x_tim5.h</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\libs\inc\stm8l15x_usart.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\inc\stm8l15x_wfe.h</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\libs\inc\stm8l15x_wwdg.h</name>
@@ -2225,28 +2174,10 @@
         <group>
             <name>src</name>
             <file>
-                <name>$PROJ_DIR$\libs\src\stm8l15x_adc.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\src\stm8l15x_aes.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\src\stm8l15x_beep.c</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\libs\src\stm8l15x_clk.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\libs\src\stm8l15x_comp.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\src\stm8l15x_dac.c</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\libs\src\stm8l15x_dma.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\src\stm8l15x_exti.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\libs\src\stm8l15x_flash.c</name>
@@ -2255,31 +2186,10 @@
                 <name>$PROJ_DIR$\libs\src\stm8l15x_gpio.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\libs\src\stm8l15x_i2c.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\src\stm8l15x_irtim.c</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\libs\src\stm8l15x_itc.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\libs\src\stm8l15x_iwdg.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\src\stm8l15x_lcd.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\src\stm8l15x_pwr.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\src\stm8l15x_rst.c</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\libs\src\stm8l15x_rtc.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\src\stm8l15x_spi.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\libs\src\stm8l15x_syscfg.c</name>
@@ -2291,19 +2201,7 @@
                 <name>$PROJ_DIR$\libs\src\stm8l15x_tim2.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\libs\src\stm8l15x_tim3.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\src\stm8l15x_tim4.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\src\stm8l15x_tim5.c</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\libs\src\stm8l15x_usart.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\libs\src\stm8l15x_wfe.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\libs\src\stm8l15x_wwdg.c</name>
@@ -2320,9 +2218,6 @@
         </file>
         <file>
             <name>$PROJ_DIR$\src\config.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\src\data.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\src\init.c</name>

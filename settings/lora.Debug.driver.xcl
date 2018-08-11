@@ -6,6 +6,8 @@
 
 "STM8L052R8" 
 
+"--erase_memory" 
+
 
 
 

@@ -4,26 +4,51 @@ void initCLK();
 void InitDevice()
 {
     initCLK();
-    DelayUs(20000); //时钟初始化后可能不稳定，要加延时
     InitLoraPin();
     InitConf();
     InitUart();
     InitClock();
     InitTask();
-    if (conf.DevType == 0) //网关
-    {
-        InitGPRSConf();
-    }
-    // if (conf.DevType == 0) //网关
-    // {
-    //     InitGPRSConf();
-    //     InitLoraConf();
-    // }
-    // else
-    // {
-    //     InitLoraConf();
-    // }
     enableInterrupts();
+
+    if (RESET == GetConfFlag(Conf_FLAG_INTEGRITY)) //数据不完成则恢复出厂设置
+    {
+        ConfRestoredefault();
+    }
+
+    if (Conf.DevType == DevType_UnKnown) //设备类型未知
+    {
+        InitGPRSConf(); //尝试设置GPRS，并根据条件判断是不是网关
+        //GwRegister();   //如果可以注册成功就认为是网关,不能同时进行
+    }
+    else
+    {
+        if (RESET == GetConfFlag(Conf_FLAG_LORA)) //配置lora参数
+        {
+            InitLoraConf();
+        }
+
+        if (Conf.DevType == DevType_LoRa_Node)
+        {
+
+            if (RESET == GetConfFlag(Conf_FLAG_LORA_REGIST)) //lora配置成功，但未注册成功
+            {
+                LoraRegister();
+            }
+            else if (RESET == GetConfFlag(Conf_FLAG_LORA_DEV_Done)) //Lora对应的设备参数未配置成功
+            {
+                GetLoraDevConf();
+            }
+        }
+        else if (Conf.DevType == DevType_GW)
+        {
+            if (RESET == GetConfFlag(Conf_FLAG_GPRS))
+            {
+                InitGPRSConf();
+            }
+        }
+    }
+    SendSyncTime();
 }
 
 void initCLK()
@@ -36,7 +61,8 @@ void initCLK()
     CLK_SYSCLKSourceConfig(CLK_SYSCLKSource_HSE);
 
     while (CLK_GetSYSCLKSource() != CLK_SYSCLKSource_HSE)
-        ; //等待切换到外部晶振
+        ;           //等待切换到外部晶振
+    DelayUs(20000); //时钟初始化后可能不稳定，要加延时
 
     CLK_RTCClockConfig(CLK_RTCCLKSource_HSE, CLK_RTCCLKDiv_64); //16MHz/64=25KHz
 
@@ -53,7 +79,6 @@ void initCLK()
 void initMapPort()
 {
     SYSCFG_REMAPDeInit();
-    //SYSCFG_REMAPPinConfig();
 }
 
 void DelayUs(uint32_t delay)
